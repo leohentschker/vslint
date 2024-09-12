@@ -19,10 +19,7 @@ const getContentHash = (content: string) => {
 };
 
 const elementIsHTMLElement = (element: unknown): element is HTMLElement => {
-	return (
-		typeof element === "object" &&
-		element !== null
-	);
+	return typeof element === "object" && element !== null;
 };
 const getViewportSize = (
 	params?: DesignReviewParams,
