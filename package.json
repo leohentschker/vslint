@@ -2,11 +2,7 @@
 	"name": "vslint",
 	"version": "0.0.1",
 	"description": "A demo package for Total TypeScript",
-	"keywords": [
-		"ai",
-		"design",
-		"testing"
-	],
+	"keywords": ["ai", "design", "testing"],
 	"homepage": "https://github.com/leohentschker/vslint",
 	"bugs": {
 		"url": "https://github.com/leohentschker/vslint/issues"
@@ -16,20 +12,21 @@
 		"type": "git",
 		"url": "git+https://github.com/leohentschker/vslint.git"
 	},
-	"workspaces": [
-		"packages/*"
-	],
+	"workspaces": ["packages/*"],
 	"devDependencies": {
 		"@arethetypeswrong/cli": "^0.16.2",
 		"@biomejs/biome": "1.8.3",
 		"tsup": "^8.2.4",
-		"typescript": "^5.6.2"
+		"typescript": "^5.6.2",
+		"vitest": "^2.0.5"
 	},
 	"scripts": {
-		"build": "tsup",
+		"build": "cd packages/jest && npm run build",
+		"test": "vitest run",
 		"format": "biome format --write",
 		"check": "biome check",
-		"ci": "npm run build && npm run check && npm run check-exports",
+		"lint": "tsc",
+		"ci": "npm run build && npm run check && npm run check-exports && npm run lint",
 		"check-exports": "attw --pack ./packages/*"
 	}
 }
