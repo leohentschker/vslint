@@ -21,8 +21,7 @@ const getContentHash = (content: string) => {
 const elementIsHTMLElement = (element: unknown): element is HTMLElement => {
 	return (
 		typeof element === "object" &&
-		element !== null &&
-		Object.hasOwn(element, "nodeType")
+		element !== null
 	);
 };
 const getViewportSize = (
