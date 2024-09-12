@@ -1,5 +1,11 @@
 # @vslint/jest
 
+## 0.1.2
+
+### Patch Changes
+
+- 6ad4de2: Follow up fix, still getting used to changesets
+
 ## 0.1.1
 
 ### Patch Changes
