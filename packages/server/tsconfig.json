@@ -17,7 +17,7 @@
 		"module": "Preserve",
 
 		"noEmit": true,
-		
+
 		"outDir": "./dist",
 		"rootDir": "./src",
 		"types": ["node"]

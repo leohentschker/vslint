@@ -40,14 +40,13 @@ expect.extend(extendExpectDesignReviewer({
 | `forceReview`             | `boolean`  | `false`                    | If true, the snapshot will be reviewed even if it has already been reviewed and the content of your snapshot has not changed.
 | `reviewEndpoint`          | `string`   | `https://vslint-644118703752.us-central1.run.app/api/v1/design-review` | The endpoint to use for the review server.
 
-Now that the matcher is setup, you can use it in your tests to check if the snapshot passes design review.
+Now that the matcher is setup, you can use it in your tests to check if the snapshot passes design review. The `toPassDesignReview` method expects to be called on an `HTMLElement`.
 ```typescript
 import { render } from '@testing-library/react';
 
 test('should render a button', () => {
-  const { container } = render(<Button>Hellzzo World</Button>);
+  const { container } = render(<div>Incredibly long content potentially too long. Human readability is best at a maximum of 75 characters</div>);
   // use the new matcher to check if the snapshot passes design review
   expect(container).toPassDesignReview();
 });
 ```
-the `toPassDesignReview` method expects to be called on an `HTMLElement`.
