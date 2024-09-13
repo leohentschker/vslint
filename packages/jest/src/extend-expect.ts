@@ -94,12 +94,12 @@ type DesignReviewResult = {
 };
 
 export const extendExpectDesignReviewer = (args: {
-	designReviewEndpoint: string;
+	reviewEndpoint: string;
 	snapshotsDir: string;
 	cssPath: string;
 	forceReview?: boolean;
 }) => {
-	const { cssPath, snapshotsDir, forceReview, designReviewEndpoint } = args;
+	const { cssPath, snapshotsDir, forceReview, reviewEndpoint } = args;
 	if (!fs.existsSync(cssPath)) {
 		throw new Error(`Could not find CSS file at path ${cssPath}`);
 	}
@@ -145,7 +145,7 @@ export const extendExpectDesignReviewer = (args: {
 			}
 
 			try {
-				const response = await axios.post(designReviewEndpoint, {
+				const response = await axios.post(reviewEndpoint, {
 					content: received.outerHTML,
 					styles: customStyles,
 					options: {
