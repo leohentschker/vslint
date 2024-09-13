@@ -2,7 +2,8 @@ import * as fs from "node:fs";
 import path from "node:path";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { GoogleAIFileManager } from "@google/generative-ai/server";
-import { Failure, Ok } from "./types";
+import { logger } from "../logger";
+import { Failure, Ok } from "../types";
 
 const TMPFILE_DIR = "./review_images/";
 
@@ -28,6 +29,7 @@ const getModel = () => {
   text_has_typos: If there are absolutely any spelling or grammatical errors, or content is in the wrong tense, mark it as true; otherwise, mark it as false. Be very harsh.
   text_is_coherent: If text for grouped elements isn't following the same grammatical style or structure, mark it as true; otherwise, mark it as false
   text_too_small: Check if the text is easily readable. If the text size is too small, mark it as true; otherwise, mark it as false.
+	hierarchy_through_font_weight: Check to see if hierarchy is managed via font weight not via font size. 
 
   You also add a final field called "explanation" that gives a summary of the most important rules that failed. If no rules failed this should be null.
   `.trim();
@@ -47,7 +49,7 @@ const uploadToGemini = async (imageBuffer: Buffer, mimeType: "image/png") => {
 	const tmpFile = path.join(TMPFILE_DIR, fileName);
 	if (!fs.existsSync(TMPFILE_DIR)) fs.mkdirSync(TMPFILE_DIR);
 	fs.writeFileSync(tmpFile, imageBuffer);
-	console.log("Wrote tmpfile to", tmpFile);
+	logger.debug(`Wrote tmpfile to ${tmpFile}`);
 
 	const { response: fileManager, error: fileManagerError } = getFileManager();
 	if (fileManagerError) {
@@ -57,7 +59,7 @@ const uploadToGemini = async (imageBuffer: Buffer, mimeType: "image/png") => {
 		mimeType,
 		displayName: fileName,
 	});
-	// fs.unlinkSync(tmpFile);
+	fs.unlinkSync(tmpFile);
 	const file = uploadResult.file;
 	return Ok(file);
 };
