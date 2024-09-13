@@ -13,12 +13,15 @@ RUN npm install
 # Copy package.json and package-lock.json from the current directory
 COPY ./package*.json ./
 
-# Install dependencies from the current directory
-# Use --prefix to avoid overwriting the previous node_modules
 RUN npm install
 
 # Copy the application code
 COPY . .
+
+RUN npm install tsup typescript --save-dev
+
+# Build the TypeScript code
+RUN npm run build
 
 # Expose port 8080
 EXPOSE 8080
