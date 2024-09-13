@@ -2,8 +2,8 @@ import * as fs from "node:fs";
 import path from "node:path";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { GoogleAIFileManager } from "@google/generative-ai/server";
-import { Failure, Ok } from "../types";
 import { logger } from "../logger";
+import { Failure, Ok } from "../types";
 
 const TMPFILE_DIR = "./review_images/";
 

@@ -1,5 +1,5 @@
 import winston from "winston";
-import { DesignReviewParams } from "./types";
+import type { DesignReviewParams } from "./types";
 
 export const getLogger = (logInput?: DesignReviewParams["log"]) => {
 	if (!logInput || typeof logInput === "string") {

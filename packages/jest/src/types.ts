@@ -1,4 +1,4 @@
-import type { LoggerOptions, Logger } from "winston";
+import type { Logger, LoggerOptions } from "winston";
 
 export type DesignReviewParams = {
 	atSize?:

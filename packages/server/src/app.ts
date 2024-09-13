@@ -2,9 +2,9 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import express from "express";
 import { renderDom } from ".";
+import { logger } from "./logger";
 import { runReview } from "./review/gemini";
 import { RenderRequestSchema } from "./types";
-import { logger } from "./logger";
 
 const port = process.env.PORT || 8080;
 const app = express();

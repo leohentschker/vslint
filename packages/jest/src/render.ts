@@ -1,4 +1,4 @@
-import { DesignReviewParams } from "./types";
+import type { DesignReviewParams } from "./types";
 
 export const elementIsHTMLElement = (
 	element: unknown,

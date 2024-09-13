@@ -9,6 +9,15 @@ export const RenderRequestSchema = z.object({
 			height: z.number(),
 		}),
 	}),
+	model: z
+		.object({
+			model: z
+				.literal("gpt-4o")
+				.or(z.literal("gpt-4o-mini"))
+				.or(z.literal("gemini-1.5-flash")),
+			key: z.string(),
+		})
+		.optional(),
 });
 export type RenderRequest = z.infer<typeof RenderRequestSchema>;
 

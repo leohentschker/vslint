@@ -2,13 +2,13 @@ import crypto from "node:crypto";
 import * as fs from "node:fs";
 import path from "node:path";
 import axios from "axios";
-import type { DesignReviewParams } from "./types";
 import { getLogger } from "./logging";
 import { elementIsHTMLElement, getViewportSize } from "./render";
+import type { DesignReviewParams } from "./types";
 
 global.setImmediate =
 	global.setImmediate ||
-	((fn: any, ...args: any[]) => global.setTimeout(fn, 0, ...args));
+	((fn: TimerHandler, ...args: unknown[]) => global.setTimeout(fn, 0, ...args));
 
 export const kebabCase = (str: string) =>
 	str
@@ -66,8 +66,8 @@ export const extendExpectDesignReviewer = (args: {
 
 			const snapshotFileExists = fs.existsSync(snapshotPath);
 			if (snapshotFileExists)
-				logger.debug(`Snapshot file exists, pulling existing data`);
-			else logger.debug(`Snapshot file does not exist, creating new snapshot`);
+				logger.debug("Snapshot file exists, pulling existing data");
+			else logger.debug("Snapshot file does not exist, creating new snapshot");
 
 			const forceRereview = params?.forceReviewTest || forceReviewAll;
 			logger.debug(
@@ -98,7 +98,7 @@ export const extendExpectDesignReviewer = (args: {
 				return {
 					pass: !!existingSnapshot.pass,
 					message: () =>
-						!!existingSnapshot.pass
+						existingSnapshot.pass
 							? "Snapshot passed design review"
 							: `Snapshot failed design review. ${existingSnapshot.explanation}`,
 				};
@@ -107,7 +107,7 @@ export const extendExpectDesignReviewer = (args: {
 			logger.debug(`Viewport: ${JSON.stringify(viewport)}`);
 
 			try {
-				logger.debug(`Sending request to review endpoint`);
+				logger.debug("Sending request to review endpoint");
 				const response = await axios.post(reviewEndpoint, {
 					content: received.outerHTML,
 					styles: customStyles,
