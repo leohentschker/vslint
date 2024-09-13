@@ -17,6 +17,9 @@ RUN npm install tsup typescript --save-dev
 # Build the TypeScript code
 RUN npm run build
 
+# Install puppeteer dependencies
+RUN npx puppeteer browsers install
+
 # Expose port 8080
 EXPOSE 8080
 
