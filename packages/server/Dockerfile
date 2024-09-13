@@ -6,40 +6,19 @@ WORKDIR /usr/src/app
 
 # Install dependencies for Puppeteer
 RUN apt-get update && apt-get install -y \
-    fonts-liberation \
-    gconf-service \
-    libappindicator1 \
-    libasound2 \
-    libatk1.0-0 \
-    libcairo2 \
-    libcups2 \
-    libfontconfig1 \
-    libgbm-dev \
-    libgdk-pixbuf2.0-0 \
-    libgtk-3-0 \
-    libicu-dev \
-    libjpeg-dev \
-    libnspr4 \
-    libnss3 \
-    libpango-1.0-0 \
-    libpangocairo-1.0-0 \
-    libpng-dev \
-    libx11-6 \
-    libx11-xcb1 \
-    libxcb1 \
-    libxcomposite1 \
-    libxcursor1 \
-    libxdamage1 \
-    libxext6 \
-    libxfixes3 \
-    libxi6 \
-    libxrandr2 \
-    libxrender1 \
-    libxss1 \
-    libxtst6 \
-    xdg-utils \
-    && apt-get clean \
+    wget \
+    gnupg \
+    ca-certificates \
+    procps \
+    && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
+    && echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list \
+    && apt-get update \
+    && apt-get install -y google-chrome-stable \
     && rm -rf /var/lib/apt/lists/*
+
+# Verify Chrome installation
+RUN google-chrome-stable --version && \
+    ls -l /usr/bin/google-chrome-stable
 
 # Copy package.json and package-lock.json from the current directory
 COPY ./package*.json ./
@@ -54,8 +33,9 @@ RUN npm install tsup typescript --save-dev
 # Build the TypeScript code
 RUN npm run build
 
-# Install puppeteer dependencies
-RUN npx puppeteer browsers install
+# Set environment variables for Puppeteer
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
+    PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome-stable
 
 # Expose port 8080
 EXPOSE 8080

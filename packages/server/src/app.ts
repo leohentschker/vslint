@@ -39,7 +39,7 @@ app.post("/api/v1/design-review", async (req, res) => {
 		"image/png",
 	);
 	if (reviewError) {
-		console.log(renderError, 'Failed to run automated design review');
+		console.log(reviewError, 'Failed to run automated design review');
 		return res.status(500).json({
 			error: "Failed to review",
 			message: reviewError.message,
