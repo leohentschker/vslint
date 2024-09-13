@@ -31,6 +31,7 @@ export const renderDom = async ({
 		await page.close();
 		return Ok(Buffer.from(pageScreenshot));
 	} catch (err) {
+		console.log(err, 'Failed to render DOM');
 		return Failure(err);
 	}
 };

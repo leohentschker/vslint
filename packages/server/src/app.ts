@@ -11,6 +11,7 @@ app.use(bodyParser.json({ limit: "50mb" }));
 app.use(cors());
 
 app.post("/api/v1/design-review", async (req, res) => {
+	console.log('Initiating request...');
 	const {
 		success: parseSuccess,
 		data: reviewRequest,
