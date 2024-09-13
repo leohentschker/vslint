@@ -10,9 +10,11 @@ export const kebabCase = (str: string) =>
 		.replace(/[\s_]+/g, "-")
 		.toLowerCase();
 
-const getSnapshotIdentifier = () => {
+const getSnapshotIdentifier = (params: DesignReviewParams | undefined) => {
 	const { currentTestName, testPath } = expect.getState();
-	return kebabCase(`${path.basename(testPath || "")}-${currentTestName}`);
+	return kebabCase(
+		`${path.basename(testPath || "")}-${currentTestName}${params?.atSize ? `-${params.atSize}` : ""}`,
+	);
 };
 const getContentHash = (content: string) => {
 	return crypto.createHash("sha256").update(content).digest("hex");
@@ -115,7 +117,7 @@ export const extendExpectDesignReviewer = (args: {
 			received: unknown,
 			params?: DesignReviewParams,
 		): Promise<jest.CustomMatcherResult> {
-			const snapshotIdentifier = getSnapshotIdentifier();
+			const snapshotIdentifier = getSnapshotIdentifier(params);
 			const snapshotPath = path.join(
 				snapshotsDir,
 				`${snapshotIdentifier}.json`,

@@ -11,12 +11,14 @@ app.use(bodyParser.json({ limit: "50mb" }));
 app.use(cors());
 
 app.post("/api/v1/design-review", async (req, res) => {
+	console.log("Initiating request...");
 	const {
 		success: parseSuccess,
 		data: reviewRequest,
 		error: parseError,
 	} = RenderRequestSchema.safeParse(req.body);
 	if (!parseSuccess) {
+		console.log(parseError, "Failed to parse request");
 		return res.status(400).json({
 			error: "Invalid request",
 			message: parseError.message,
@@ -25,6 +27,7 @@ app.post("/api/v1/design-review", async (req, res) => {
 	const { response: renderResponse, error: renderError } =
 		await renderDom(reviewRequest);
 	if (renderError) {
+		console.log(renderError, "Failed to render container");
 		return res.status(500).json({
 			error: "Failed to render",
 			message: renderError.message,
@@ -36,6 +39,7 @@ app.post("/api/v1/design-review", async (req, res) => {
 		"image/png",
 	);
 	if (reviewError) {
+		console.log(reviewError, "Failed to run automated design review");
 		return res.status(500).json({
 			error: "Failed to review",
 			message: reviewError.message,
