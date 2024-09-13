@@ -23,8 +23,10 @@ Right now VSLint only supports the `jest` test runner. You can either deploy you
 ```bash
 npm install @vslint/jest --save-dev
 ```
-In order to render your content correctly, VSLint requires a css file to be passed in. This file will be used to generate a hash of the css file and the snapshot. This hash is used to cache results for tests based on the snapshot and the css file.
+The first step is to extend jest's expect to include a new matcher that the design review.
 ```typescript
+import { extendExpectDesignReviewer } from '@vslint/jest';
+
 // extend jest's expect
 expect.extend(extendExpectDesignReviewer({
   snapshotsDir: '__tests__/__snapshots__',
@@ -38,3 +40,14 @@ expect.extend(extendExpectDesignReviewer({
 | `forceReview`             | `boolean`  | `false`                    | If true, the snapshot will be reviewed even if it has already been reviewed and the content of your snapshot has not changed.
 | `reviewEndpoint`          | `string`   | `https://vslint-644118703752.us-central1.run.app/api/v1/design-review` | The endpoint to use for the review server.
 
+Now that the matcher is setup, you can use it in your tests to check if the snapshot passes design review.
+```typescript
+import { render } from '@testing-library/react';
+
+test('should render a button', () => {
+  const { container } = render(<Button>Hellzzo World</Button>);
+  // use the new matcher to check if the snapshot passes design review
+  expect(container).toPassDesignReview();
+});
+```
+the `toPassDesignReview` method expects to be called on an `HTMLElement`.

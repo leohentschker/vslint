@@ -45,6 +45,9 @@ const getModel = () => {
 const uploadToGemini = async (imageBuffer: Buffer, mimeType: "image/png") => {
 	const fileName = `${new Date().getTime()}.png`;
 	const tmpFile = path.join(TMPFILE_DIR, fileName);
+	if (!fs.existsSync(TMPFILE_DIR)) {
+		fs.mkdirSync(TMPFILE_DIR);
+	}
 	fs.writeFileSync(tmpFile, imageBuffer);
 
 	const { response: fileManager, error: fileManagerError } = getFileManager();
