@@ -3,6 +3,12 @@ import * as fs from "node:fs";
 import path from "node:path";
 import axios from "axios";
 import type { DesignReviewParams } from "./types";
+import { getLogger } from "./logging";
+import { elementIsHTMLElement, getViewportSize } from "./render";
+
+global.setImmediate =
+	global.setImmediate ||
+	((fn: any, ...args: any[]) => global.setTimeout(fn, 0, ...args));
 
 export const kebabCase = (str: string) =>
 	str
@@ -20,78 +26,10 @@ const getContentHash = (content: string) => {
 	return crypto.createHash("sha256").update(content).digest("hex");
 };
 
-const elementIsHTMLElement = (element: unknown): element is HTMLElement => {
-	return typeof element === "object" && element !== null;
-};
-const getViewportSize = (
-	params?: DesignReviewParams,
-): { width: number; height: number } => {
-	if (params === undefined) {
-		return {
-			width: 1920,
-			height: 1080,
-		};
-	}
-	if (params.atSize === "full-screen") {
-		return {
-			width: 1920,
-			height: 1080,
-		};
-	}
-	if (params.atSize === "mobile") {
-		return {
-			width: 375,
-			height: 812,
-		};
-	}
-	if (params.atSize === "tablet") {
-		return {
-			width: 768,
-			height: 1024,
-		};
-	}
-	if (params.atSize === "sm") {
-		return {
-			width: 640,
-			height: 480,
-		};
-	}
-	if (params.atSize === "md") {
-		return {
-			width: 768,
-			height: 1024,
-		};
-	}
-	if (params.atSize === "lg") {
-		return {
-			width: 1024,
-			height: 768,
-		};
-	}
-	if (params.atSize === "xl") {
-		return {
-			width: 1280,
-			height: 1024,
-		};
-	}
-	if (params.atSize === "2xl") {
-		return {
-			width: 1536,
-			height: 1024,
-		};
-	}
-	if (params.atSize === "3xl") {
-		return {
-			width: 1920,
-			height: 1080,
-		};
-	}
-	return params.atSize;
-};
-
 type DesignReviewResult = {
 	violations: Record<string, boolean>;
 	contentHash: string;
+	explanation: string;
 	pass: boolean;
 };
 
@@ -99,9 +37,9 @@ export const extendExpectDesignReviewer = (args: {
 	reviewEndpoint: string;
 	snapshotsDir: string;
 	cssPath: string;
-	forceReview?: boolean;
+	forceReviewAll?: boolean;
 }) => {
-	const { cssPath, snapshotsDir, forceReview, reviewEndpoint } = args;
+	const { cssPath, snapshotsDir, forceReviewAll, reviewEndpoint } = args;
 	if (!fs.existsSync(cssPath)) {
 		throw new Error(`Could not find CSS file at path ${cssPath}`);
 	}
@@ -118,59 +56,97 @@ export const extendExpectDesignReviewer = (args: {
 			params?: DesignReviewParams,
 		): Promise<jest.CustomMatcherResult> {
 			const snapshotIdentifier = getSnapshotIdentifier(params);
+			const logger = getLogger(params?.log);
+
 			const snapshotPath = path.join(
 				snapshotsDir,
 				`${snapshotIdentifier}.json`,
 			);
+			logger.debug(`Snapshot path: ${snapshotPath}`);
+
+			const snapshotFileExists = fs.existsSync(snapshotPath);
+			if (snapshotFileExists)
+				logger.debug(`Snapshot file exists, pulling existing data`);
+			else logger.debug(`Snapshot file does not exist, creating new snapshot`);
+
+			const forceRereview = params?.forceReviewTest || forceReviewAll;
+			logger.debug(
+				forceRereview
+					? "Re-reviewing all snapshots."
+					: "Not forcing re-review, will check for existing snapshot changes.",
+			);
+
 			const existingSnapshot: Partial<DesignReviewResult> =
-				forceReview || !fs.existsSync(snapshotPath)
+				forceRereview || !fs.existsSync(snapshotPath)
 					? {}
 					: JSON.parse(fs.readFileSync(snapshotPath, "utf8"));
 
 			if (!elementIsHTMLElement(received)) {
-				return {
-					pass: false,
-					message: () =>
-						"Received invalid value for element. Make sure that you pass a HTMLElement object into your expect call! This should look like:\nconst { container } = render(...);\nexpect(container).toPassDesignReview();",
-				};
+				const errorMessage =
+					"Received invalid value for element. Make sure that you pass a HTMLElement object into your expect call! This should look like:\nconst { container } = render(...);\nexpect(container).toPassDesignReview();";
+				logger.error(errorMessage);
+				return { pass: false, message: () => errorMessage };
 			}
 
 			if (
-				!forceReview &&
+				!forceRereview &&
 				existingSnapshot.contentHash === getContentHash(received.outerHTML)
 			) {
+				logger.debug(
+					`Snapshot ${snapshotPath} already exists and has the same content hash. Skipping review. To force a review, pass the option { forceReview: true } to your expect call.`,
+				);
 				return {
 					pass: !!existingSnapshot.pass,
 					message: () =>
-						`Snapshot ${snapshotPath} already exists and has the same content hash. If you want to force a review, pass the option { forceReview: true } to your expect call.`,
+						!!existingSnapshot.pass
+							? "Snapshot passed design review"
+							: `Snapshot failed design review. ${existingSnapshot.explanation}`,
 				};
 			}
+			const viewport = getViewportSize(params);
+			logger.debug(`Viewport: ${JSON.stringify(viewport)}`);
 
 			try {
+				logger.debug(`Sending request to review endpoint`);
 				const response = await axios.post(reviewEndpoint, {
 					content: received.outerHTML,
 					styles: customStyles,
 					options: {
-						viewport: getViewportSize(params),
+						viewport,
 					},
 				});
 				const { explanation, ...violations } = response.data;
 				const pass = Object.values(violations).every(
 					(checkFailed) => !checkFailed,
 				);
+				logger.debug(`Review result: ${JSON.stringify(violations, null, 2)}`);
 
-				fs.writeFileSync(
-					snapshotPath,
-					JSON.stringify(
-						{
-							violations,
-							contentHash: getContentHash(received.outerHTML),
-							pass,
-						},
-						null,
-						2,
-					),
-				);
+				const newSnapshot = {
+					explanation,
+					violations,
+					contentHash: getContentHash(received.outerHTML),
+					pass,
+				};
+				if (newSnapshot !== existingSnapshot) {
+					logger.debug(`Snapshot ${snapshotPath} has changed, updating`);
+					fs.writeFileSync(
+						snapshotPath,
+						JSON.stringify(
+							{
+								explanation,
+								violations,
+								contentHash: getContentHash(received.outerHTML),
+								pass,
+							},
+							null,
+							2,
+						),
+					);
+				} else {
+					logger.debug(
+						`Snapshot ${snapshotPath} has not changed, skipping update`,
+					);
+				}
 
 				const message = () =>
 					pass
@@ -181,6 +157,7 @@ export const extendExpectDesignReviewer = (args: {
 					pass,
 				};
 			} catch (err) {
+				logger.debug(`Failed to run design review: ${err}`);
 				return {
 					pass: false,
 					message: () => `Failed to run design review: ${err}`,

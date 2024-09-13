@@ -1,5 +1,7 @@
+import type { LoggerOptions, Logger } from "winston";
+
 export type DesignReviewParams = {
-	atSize:
+	atSize?:
 		| "full-screen"
 		| "mobile"
 		| "tablet"
@@ -10,6 +12,8 @@ export type DesignReviewParams = {
 		| "2xl"
 		| "3xl"
 		| { width: number; height: number };
+	log?: LoggerOptions["level"] | Logger;
+	forceReviewTest?: boolean;
 };
 
 declare global {

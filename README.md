@@ -12,7 +12,7 @@ expect.extend(extendExpectDesignReviewer({
 test('should render a button', () => {
   const { container } = render(<Button>Hello World</Button>);
   // use the new matcher to check if the snapshot passes design review
-  expect(container).toPassDesignReview();
+  await expect(container).toPassDesignReview();
 });
 ```
 
@@ -37,16 +37,17 @@ expect.extend(extendExpectDesignReviewer({
 | ------------------------ | -------- | ------------------------ | -------------------------------------------------------------------------------------------------------------------------- |
 | `snapshotsDir`             | `string`   |                          | The directory where the snapshots are stored.
 | `cssPath`                  | `string`   |                          | The path to the css file that is used to generate the hash of the css file and the snapshot.
-| `forceReview`             | `boolean`  | `false`                    | If true, the snapshot will be reviewed even if it has already been reviewed and the content of your snapshot has not changed.
+| `forceReviewTest`             | `boolean`  | `false`                    | If true, the snapshot will be reviewed even again if it has already been reviewed and the content of your snapshot has not changed.
 | `reviewEndpoint`          | `string`   | `https://vslint-644118703752.us-central1.run.app/api/v1/design-review` | The endpoint to use for the review server.
+| `log`                     | `string` or `winston.Logger`  | `info`                    | Allows you to set a log level or pass in a custom Winston logger.
 
 Now that the matcher is setup, you can use it in your tests to check if the snapshot passes design review. The `toPassDesignReview` method expects to be called on an `HTMLElement`.
 ```typescript
 import { render } from '@testing-library/react';
 
-test('should render a button', () => {
+test('render text that is too long and hard to read', () => {
   const { container } = render(<div>Incredibly long content potentially too long. Human readability is best at a maximum of 75 characters</div>);
-  // use the new matcher to check if the snapshot passes design review
-  expect(container).toPassDesignReview();
+  // it's important to always await the matcher as the design review call is asynchronous
+  await expect(container).toPassDesignReview();
 });
 ```
