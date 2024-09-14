@@ -19,6 +19,7 @@ app.post("/api/v1/design-review", async (req, res) => {
 		error: parseError,
 	} = RenderRequestSchema.safeParse(req.body);
 	if (!parseSuccess) {
+		logger.error(`Failed to parse request: ${parseError.message}`);
 		return res.status(400).json({
 			error: "Invalid request",
 			message: parseError.message,
@@ -35,6 +36,7 @@ app.post("/api/v1/design-review", async (req, res) => {
 	}
 
 	const { response: reviewResponse, error: reviewError } = await runReview(
+		reviewRequest,
 		renderResponse,
 		"image/png",
 	);

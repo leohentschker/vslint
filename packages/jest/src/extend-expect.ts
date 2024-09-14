@@ -1,9 +1,10 @@
 import crypto from "node:crypto";
 import * as fs from "node:fs";
 import path from "node:path";
-import axios from "axios";
+import axios, { type AxiosError, type AxiosResponse } from "axios";
 import { getLogger } from "./logging";
 import { elementIsHTMLElement, getViewportSize } from "./render";
+import { DEFAULT_RULES } from "./rules";
 import type { DesignReviewParams } from "./types";
 
 global.setImmediate =
@@ -38,8 +39,17 @@ export const extendExpectDesignReviewer = (args: {
 	snapshotsDir: string;
 	cssPath: string;
 	forceReviewAll?: boolean;
+	model: { modelName: string; key: string };
+	rules?: { ruleid: string; description: string }[];
 }) => {
-	const { cssPath, snapshotsDir, forceReviewAll, reviewEndpoint } = args;
+	const {
+		cssPath,
+		snapshotsDir,
+		forceReviewAll,
+		reviewEndpoint,
+		model,
+		rules,
+	} = args;
 	if (!fs.existsSync(cssPath)) {
 		throw new Error(`Could not find CSS file at path ${cssPath}`);
 	}
@@ -47,6 +57,9 @@ export const extendExpectDesignReviewer = (args: {
 		throw new Error(
 			`Could not find snapshots directory at path ${snapshotsDir}`,
 		);
+	}
+	if (!model?.modelName || !model?.key) {
+		throw new Error("Model name and key must be provided in the model config");
 	}
 
 	const customStyles = fs.readFileSync(cssPath, "utf8");
@@ -106,63 +119,71 @@ export const extendExpectDesignReviewer = (args: {
 			const viewport = getViewportSize(params);
 			logger.debug(`Viewport: ${JSON.stringify(viewport)}`);
 
+			let response: AxiosResponse;
+
 			try {
 				logger.debug("Sending request to review endpoint");
-				const response = await axios.post(reviewEndpoint, {
+				response = await axios.post(reviewEndpoint, {
 					content: received.outerHTML,
 					styles: customStyles,
+					rules: rules || DEFAULT_RULES,
+					model,
 					options: {
 						viewport,
 					},
 				});
-				const { explanation, ...violations } = response.data;
-				const pass = Object.values(violations).every(
-					(checkFailed) => !checkFailed,
-				);
-				logger.debug(`Review result: ${JSON.stringify(violations, null, 2)}`);
-
-				const newSnapshot = {
-					explanation,
-					violations,
-					contentHash: getContentHash(received.outerHTML),
-					pass,
-				};
-				if (newSnapshot !== existingSnapshot) {
-					logger.debug(`Snapshot ${snapshotPath} has changed, updating`);
-					fs.writeFileSync(
-						snapshotPath,
-						JSON.stringify(
-							{
-								explanation,
-								violations,
-								contentHash: getContentHash(received.outerHTML),
-								pass,
-							},
-							null,
-							2,
-						),
-					);
-				} else {
-					logger.debug(
-						`Snapshot ${snapshotPath} has not changed, skipping update`,
-					);
-				}
-
-				const message = () =>
-					pass
-						? "Automated review successful"
-						: `Design review failed: ${explanation}`;
-				return {
-					message,
-					pass,
-				};
 			} catch (err) {
-				logger.debug(`Failed to run design review: ${err}`);
+				const axiosError = err as AxiosError;
+				logger.error(
+					`Error while sending request to review endpoint: ${axiosError.message}`,
+				);
 				return {
 					pass: false,
-					message: () => `Failed to run design review: ${err}`,
+					message: () =>
+						`Error while sending request to review endpoint: ${axiosError.message}`,
 				};
 			}
+			const { explanation, ...violations } = response.data;
+			const pass = Object.values(violations).every(
+				(checkFailed) => !checkFailed,
+			);
+			logger.debug(`Review result: ${JSON.stringify(violations, null, 2)}`);
+
+			const newSnapshot = {
+				explanation,
+				violations,
+				contentHash: getContentHash(received.outerHTML),
+				pass,
+			};
+			if (newSnapshot !== existingSnapshot) {
+				logger.debug(`Snapshot ${snapshotPath} has changed, updating`);
+				fs.writeFileSync(
+					snapshotPath,
+					JSON.stringify(
+						{
+							explanation,
+							violations,
+							contentHash: getContentHash(received.outerHTML),
+							pass,
+						},
+						null,
+						2,
+					),
+				);
+			} else {
+				logger.debug(
+					`Snapshot ${snapshotPath} has not changed, skipping update`,
+				);
+			}
+
+			const message = () =>
+				pass
+					? "Automated review successful"
+					: `Design review failed: ${explanation}`;
+			return {
+				message,
+				pass,
+			};
 		},
 	};
 };
