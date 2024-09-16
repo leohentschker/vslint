@@ -35,9 +35,11 @@ type DesignReviewResult = {
 };
 
 const DEFAULT_DESIGN_SNAPSHOT_DIR = "__tests__/__design_snapshots__";
+const DEFAULT_REVIEW_ENDPOINT =
+	"https://vslint-644118703752.us-central1.run.app/api/v1/design-review";
 
 export const extendExpectDesignReviewer = (args: {
-	reviewEndpoint: string;
+	reviewEndpoint?: string;
 	snapshotsDir?: string;
 	customStyles: string[];
 	model: { modelName: string; key: string };
@@ -119,7 +121,7 @@ export const extendExpectDesignReviewer = (args: {
 
 			try {
 				logger.debug("Sending request to review endpoint");
-				response = await axios.post(reviewEndpoint, {
+				response = await axios.post(reviewEndpoint || DEFAULT_REVIEW_ENDPOINT, {
 					content: received.outerHTML,
 					stylesheets,
 					rules: rules || DEFAULT_RULES,
