@@ -35,14 +35,15 @@ type DesignReviewResult = {
 };
 
 const DEFAULT_DESIGN_SNAPSHOT_DIR = "__tests__/__design_snapshots__";
-const DEFAULT_REVIEW_ENDPOINT =
+export const DEFAULT_REVIEW_ENDPOINT =
 	"https://vslint-644118703752.us-central1.run.app/api/v1/design-review";
+export const DEFAULT_REVIEW_TIMEOUT = 25000;
 
 export const extendExpectDesignReviewer = (args: {
 	reviewEndpoint?: string;
 	snapshotsDir?: string;
 	customStyles: string[];
-	model: { modelName: string; key: string };
+	model: { modelName: string; key: string | undefined };
 	rules?: { ruleid: string; description: string }[];
 }) => {
 	const { customStyles, snapshotsDir, reviewEndpoint, model, rules } = args;
@@ -53,9 +54,6 @@ export const extendExpectDesignReviewer = (args: {
 				`Could not find CSS file at path ${cssPath}. This file is required to correctly render your snapshots with your custom files.`,
 			);
 		}
-	}
-	if (!model?.modelName || !model?.key) {
-		throw new Error("Model name and key must be provided in the model config");
 	}
 
 	// if the snapshots directory does not exist, log and create it
@@ -114,6 +112,13 @@ export const extendExpectDesignReviewer = (args: {
 							: `Snapshot failed design review. ${existingSnapshot.explanation}`,
 				};
 			}
+
+			if (!model?.modelName || !model?.key) {
+				throw new Error(
+					"Component changed but can't re-run review as model name and key are not correctly set in `extendExpectDesignReviewer`. If you are setting the model key with an environment variable, make sure that `process.env.OPENAI_API_KEY` or `process.env.GEMINI_API_KEY` is set by running export OPENAI_API_KEY=...",
+				);
+			}
+
 			const viewport = getViewportSize(params);
 			logger.debug(`Viewport: ${JSON.stringify(viewport)}`);
 

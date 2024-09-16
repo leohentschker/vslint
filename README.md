@@ -2,7 +2,7 @@
 [![npm](https://img.shields.io/npm/v/@vslint/jest)](https://www.npmjs.com/package/@vslint/jest)
 ![server status](https://github.com/leohentschker/vslint/actions/workflows/ci.yml/badge.svg?branch=main)
 
-# vslint (visual eslint) - use AI to enforce design patterns in CI
+# vslint (visual eslint) - use AI to enforce UI/UX patterns
 ![Sample test output showing design review feedback](./assets/sample_test_output.png)
 **TLDR**: Custom matcher for React testing frameworks that uses multi-modal AI models to enforce UI/UX patterns.
 * Supports the Jest testing framework
@@ -11,7 +11,7 @@
 
 ```typescript
 import { render } from '@testing-library/react';
-import { extendExpectDesignReviewer } from '@vslint/jest';
+import { extendExpectDesignReviewer, DEFAULT_REVIEW_TIMEOUT } from '@vslint/jest';
 import Button from '../src/Button'; // Adjust the import path as needed
 
 // extend jest's expect
@@ -23,10 +23,7 @@ expect.extend(extendExpectDesignReviewer({
     ruleid: "text-too-wide", description: "If any line of text contains more than 75 characters, mark it as true; otherwise, mark it as false.",
   }],
   // pass the calls through OpenAI's multi-modal models
-  model: {
-    modelName: 'gpt-4o-mini',
-    key: process.env.OPENAI_API_KEY
-  }
+  model: { modelName: 'gpt-4o-mini', key: process.env.OPENAI_API_KEY }
 }));
 
 test('text content that is too wide on desktop screens and is not legible', async () => {
@@ -34,7 +31,7 @@ test('text content that is too wide on desktop screens and is not legible', asyn
   // note that the matcher must always be async
   await expect(container).toPassDesignReview();
 // setting a timeout here is important, as the model can take a while to respond
-}, 10000);
+}, DEFAULT_REVIEW_TIMEOUT);
 ```
 
 ## Usage
@@ -58,10 +55,7 @@ expect.extend(extendExpectDesignReviewer({
   // global CSS paths that enable correct rendering
   customStyles: ['./styles/globals.css'],
   // model config to determine which provider to use for analysis
-  model: {
-    modelName: 'gpt-4o-mini',
-    key: process.env.OPENAI_API_KEY
-  },
+  model: { modelName: 'gpt-4o-mini', key: process.env.OPENAI_API_KEY },
   // optional, defaults to `DEFAULT_RULES` in '@vslint/jest/rules'
   rules: DEFAULT_RULES,
   // optional, sets a custom review endpoint. Override if you are self-hosting a review server
@@ -104,7 +98,6 @@ test('render text that is too long and hard to read', async () => {
 Deploy the dockerfile at `packages/server/Dockerfile` to a cloud provider of your choice to run your own design review server. Doing so will prevent you from hitting the rate limit of the default server and seeing slower results.
 
 [![Run on Google Cloud](https://deploy.cloud.run/button.svg)](https://deploy.cloud.run?git_repo=https://github.com/leohentschker/vslint&revision=main&dir=packages/server)
-
 
 ## Security and Privacy concerns
 VSLint supports using OpenAI and Gemini models to perform the design review. This means that your snapshots are sent to the OpenAI or Gemini API and your API key is sent to the server. If you are concerned about privacy, you should deploy your own review server and use that instead.
