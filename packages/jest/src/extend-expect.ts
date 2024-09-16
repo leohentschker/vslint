@@ -34,9 +34,11 @@ type DesignReviewResult = {
 	pass: boolean;
 };
 
+const DEFAULT_DESIGN_SNAPSHOT_DIR = "__tests__/__design_snapshots__";
+
 export const extendExpectDesignReviewer = (args: {
 	reviewEndpoint: string;
-	snapshotsDir: string;
+	snapshotsDir?: string;
 	cssPath: string;
 	forceReviewAll?: boolean;
 	model: { modelName: string; key: string };
@@ -50,12 +52,15 @@ export const extendExpectDesignReviewer = (args: {
 		model,
 		rules,
 	} = args;
+	const designSnapshotsDir = snapshotsDir || DEFAULT_DESIGN_SNAPSHOT_DIR;
 	if (!fs.existsSync(cssPath)) {
-		throw new Error(`Could not find CSS file at path ${cssPath}`);
-	}
-	if (!fs.existsSync(snapshotsDir)) {
 		throw new Error(
-			`Could not find snapshots directory at path ${snapshotsDir}`,
+			`Could not find CSS file at path ${cssPath}. This file is required to correctly render your snapshots with your custom files.`,
+		);
+	}
+	if (!fs.existsSync(designSnapshotsDir)) {
+		throw new Error(
+			`Could not find snapshots directory at path ${designSnapshotsDir}. If you want to use a different directory use the \`snapshotsDir\` option.`,
 		);
 	}
 	if (!model?.modelName || !model?.key) {
@@ -72,7 +77,7 @@ export const extendExpectDesignReviewer = (args: {
 			const logger = getLogger(params?.log);
 
 			const snapshotPath = path.join(
-				snapshotsDir,
+				designSnapshotsDir,
 				`${snapshotIdentifier}.json`,
 			);
 			logger.debug(`Snapshot path: ${snapshotPath}`);

@@ -15,11 +15,15 @@ import Button from '../src/Button'; // Adjust the import path as needed
 
 // extend jest's expect
 expect.extend(extendExpectDesignReviewer({
-  // where should snapshot files be stored so we don't have to call the model again every time we run tests
-  snapshotsDir: '__tests__/__snapshots__',
   // global CSS paths that enable correct rendering
   cssPath: './styles/globals.css',
-  // model config to determine which provider to use for analysis
+  // set custom UX rules
+  rules: [{
+    ruleid: "text-too-wide",
+		description:
+			"If any line of text contains more than 75 characters, mark it as true; otherwise, mark it as false.",
+  }],
+  // pass the calls through OpenAI's multi-modal models
   model: {
     modelName: 'gpt-4o-mini',
     key: process.env.OPENAI_API_KEY
@@ -47,8 +51,9 @@ The first step is to extend jest's expect to include a new matcher that performs
 import { extendExpectDesignReviewer } from '@vslint/jest';
 
 expect.extend(extendExpectDesignReviewer({
-  // where should snapshot files be stored so we don't have to call the model again every time we run tests
-  snapshotsDir: '__tests__/__snapshots__',
+  // optional, where should snapshot files be stored so we don't have to call the model again every time we run tests
+  // defaults to to '__tests__/__design_snapshots__'
+  snapshotsDir: '__tests__/__design_snapshots__',
   // global CSS paths that enable correct rendering
   cssPath: './styles/globals.css',
   // model config to determine which provider to use for analysis
@@ -56,6 +61,8 @@ expect.extend(extendExpectDesignReviewer({
     modelName: 'gpt-4o-mini',
     key: process.env.OPENAI_API_KEY
   },
+  // optional, defaults to `DEFAULT_RULES` in '@vslint/jest/rules'
+  rules: DEFAULT_RULES,
   // optional, re-runs all tests if true
   forceReviewAll: false,
   // optional, sets a custom review endpoint. Override if you are self-hosting a review server
