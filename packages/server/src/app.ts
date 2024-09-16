@@ -3,7 +3,7 @@ import cors from "cors";
 import express from "express";
 import { renderDom } from ".";
 import { logger } from "./logger";
-import { runReview } from "./review/gemini";
+import { runReview } from "./review";
 import { RenderRequestSchema } from "./types";
 
 const port = process.env.PORT || 8080;
