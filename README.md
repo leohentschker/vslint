@@ -1,6 +1,6 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![npm](https://img.shields.io/npm/v/@vslint/jest)](https://www.npmjs.com/package/@vslint/jest)
-![server status](https://github.com/github/docs/actions/workflows/ci.yml/badge.svg?branch=main)
+![server status](https://github.com/leohentschker/vslint/actions/workflows/ci.yml/badge.svg?branch=main)
 
 # vslint (visual eslint) - use AI to enforce design patterns in CI
 ![Sample test output showing design review feedback](./assets/sample_test_output.png)
