@@ -47,7 +47,10 @@ app.post("/api/v1/design-review", async (req, res) => {
 			message: reviewError.message,
 		});
 	}
-	res.json(reviewResponse);
+	res.json({
+		...reviewResponse,
+		rendering: Buffer.from(renderResponse).toString("base64"),
+	});
 });
 
 app.listen(port, () => {

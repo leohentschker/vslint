@@ -27,6 +27,8 @@ const getChatCompletion = async (
 			response_format: {
 				type: "json_object",
 			},
+			temperature: 0,
+			seed: 42,
 			messages: [
 				{
 					role: "system",

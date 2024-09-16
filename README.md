@@ -71,6 +71,7 @@ expect.extend(extendExpectDesignReviewer({
 | `snapshotsDir`             | `string`   |  `__tests__/__design_snapshots__`        | The directory where the snapshots are stored.
 | `reviewEndpoint`          | `string`   | `https://vslint-644118703752.us-central1.run.app/api/v1/design-review` | The endpoint to use for the review server.
 | `log`                     | `string` or `winston.Logger`  | `info`                    | Allows you to set a log level or pass in a custom Winston logger.
+| `storeRendering` | `boolean` | `false` | If `true` will also store the image rendered on the server. This parameter is useful for debugging.
 
 #### Using the design review matcher
 Now that the matcher is setup, you can use it in your tests to check if the snapshot passes design review. The `toPassDesignReview` method expects to be called on an `HTMLElement`.
