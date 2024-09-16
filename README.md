@@ -10,8 +10,11 @@ import Button from '../src/Button'; // Adjust the import path as needed
 
 // extend jest's expect
 expect.extend(extendExpectDesignReviewer({
+  // where should snapshot files be stored so we don't have to call the model again every time we run tests
   snapshotsDir: '__tests__/__snapshots__',
+  // global CSS paths that enable correct rendering
   cssPath: './styles/globals.css',
+  // model config to determine which provider to use for analysis
   model: {
     modelName: 'gpt-4o-mini',
     key: process.env.OPENAI_API_KEY
@@ -24,7 +27,7 @@ test('text content that is too wide on desktop screens and is not legible', asyn
   await expect(container).toPassDesignReview();  await expect(container).toPassDesignReview();
 });
 ```
-![Description](./assets/image.png)
+![Description](./assets/sample_test_output.png)
 
 ## Usage
 Right now VSLint only supports the `jest` test runner.
@@ -39,17 +42,23 @@ The first step is to extend jest's expect to include a new matcher that performs
 ```typescript
 import { extendExpectDesignReviewer } from '@vslint/jest';
 
-// extend jest's expect
 expect.extend(extendExpectDesignReviewer({
   snapshotsDir: '__tests__/__snapshots__',
-  cssPath: './styles/globals.css'
+  cssPath: './styles/globals.css',
+  forceReviewAll: false,
+  reviewEndpoint: 'https://vslint-644118703752.us-central1.run.app/api/v1/design-review',
+  log: 'debug',
+  model: {
+    modelName: 'gpt-4o-mini',
+    key: process.env.OPENAI_API_KEY
+  }
 }));
 ```
 | Parameter                | type     | default                  | Description
 | ------------------------ | -------- | ------------------------ | -------------------------------------------------------------------------------------------------------------------------- |
 | `snapshotsDir`             | `string`   |                          | The directory where the snapshots are stored.
 | `cssPath`                  | `string`   |                          | The path to the css file that is used to generate the hash of the css file and the snapshot.
-| `forceReviewTest`             | `boolean`  | `false`                    | If true, the snapshot will be reviewed even again if it has already been reviewed and the content of your snapshot has not changed.
+| `forceReviewAll`             | `boolean`  | `false`                    | If true, the snapshot will be reviewed even again if it has already been reviewed and the content of your snapshot has not changed.
 | `reviewEndpoint`          | `string`   | `https://vslint-644118703752.us-central1.run.app/api/v1/design-review` | The endpoint to use for the review server.
 | `log`                     | `string` or `winston.Logger`  | `info`                    | Allows you to set a log level or pass in a custom Winston logger.
 | `model`                    | `{ modelName: string; key: string }`  |         | API credentials for the design review model. Supported models are `gpt-4o`, `gpt-4o-mini` and `gemini-1.5-flash`
@@ -62,7 +71,11 @@ import { render } from '@testing-library/react';
 test('render text that is too long and hard to read', () => {
   const { container } = render(<div>Incredibly long content potentially too long. Human readability is best at a maximum of 75 characters</div>);
   // it's important to always await the matcher as the design review call is asynchronous
-  await expect(container).toPassDesignReview();
+  await expect(container).toPassDesignReview({
+    forceReviewTest: false,
+    atSize: 'md',
+    log: 'debug'
+  });
 });
 ```
 
