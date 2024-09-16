@@ -1,4 +1,6 @@
-export const DEFAULT_RULES = [
+import type { Rule } from "./types";
+
+export const DEFAULT_RULES: Rule[] = [
 	{
 		ruleid: "text-too-wide",
 		description:

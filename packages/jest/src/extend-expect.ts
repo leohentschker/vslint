@@ -1,30 +1,30 @@
-import crypto from "node:crypto";
 import * as fs from "node:fs";
 import path from "node:path";
 import axios, { type AxiosError, type AxiosResponse } from "axios";
+import {
+	DEFAULT_DESIGN_SNAPSHOT_DIR,
+	DEFAULT_REVIEW_ENDPOINT,
+} from "./constants";
+import { getContentHash, kebabCase } from "./helpers";
 import { getLogger } from "./logging";
 import { elementIsHTMLElement, getViewportSize } from "./render";
 import { DEFAULT_RULES } from "./rules";
-import type { DesignReviewParams } from "./types";
+import {
+	type DesignReviewMatcher,
+	DesignReviewMatcherSchema,
+	type DesignReviewRun,
+	DesignReviewRunSchema,
+} from "./types";
 
 global.setImmediate =
 	global.setImmediate ||
 	((fn: TimerHandler, ...args: unknown[]) => global.setTimeout(fn, 0, ...args));
 
-export const kebabCase = (str: string) =>
-	str
-		.replace(/([a-z])([A-Z])/g, "$1-$2")
-		.replace(/[\s_]+/g, "-")
-		.toLowerCase();
-
-const getSnapshotIdentifier = (params: DesignReviewParams | undefined) => {
+const getSnapshotIdentifier = (params: DesignReviewRun | undefined) => {
 	const { currentTestName, testPath } = expect.getState();
 	return kebabCase(
 		`${path.basename(testPath || "")}-${currentTestName}${params?.atSize ? `-${params.atSize}` : ""}`,
 	);
-};
-const getContentHash = (content: string) => {
-	return crypto.createHash("sha256").update(content).digest("hex");
 };
 
 type DesignReviewResult = {
@@ -34,19 +34,24 @@ type DesignReviewResult = {
 	pass: boolean;
 };
 
-const DEFAULT_DESIGN_SNAPSHOT_DIR = "__tests__/__design_snapshots__";
-export const DEFAULT_REVIEW_ENDPOINT =
-	"https://vslint-644118703752.us-central1.run.app/api/v1/design-review";
-export const DEFAULT_REVIEW_TIMEOUT = 25000;
-
-export const extendExpectDesignReviewer = (args: {
-	reviewEndpoint?: string;
-	storeRendering?: boolean;
-	snapshotsDir?: string;
-	customStyles: string[];
-	rules?: { ruleid: string; description: string }[];
-	model: { modelName: string; key: string | undefined };
-}) => {
+/**
+ * Create a new jest matcher that exposes the `toPassDesignReview` method.
+ * Expose this to your jest environment by running
+ * expect.extend(extendExpectDesignReviewer({
+ *   customStyles: ['./styles/globals.css'],
+ *   model: {
+ *     modelName: 'gpt-4o',
+ *     key: process.env.OPENAI_API_KEY
+ *   }
+ * }));
+ * @param {DesignReviewMatcher} args - Configuration for the design reviewer
+ */
+export const extendExpectDesignReviewer = (unsafeArgs: DesignReviewMatcher) => {
+	const { data: args, error: extendValidationError } =
+		DesignReviewMatcherSchema.safeParse(unsafeArgs);
+	if (extendValidationError) {
+		throw new Error(extendValidationError.message);
+	}
 	const {
 		storeRendering,
 		customStyles,
@@ -71,16 +76,30 @@ export const extendExpectDesignReviewer = (args: {
 			`Created snapshots directory at path ${designSnapshotsDir}`,
 		);
 	}
-
 	const stylesheets = customStyles.map((cssPath) =>
 		fs.readFileSync(cssPath, "utf8"),
 	);
 
 	return {
+		/**
+		 * Make sure that the received element in `expect(...)` is an HTMLElement
+		 * Run at different viewport sizes by using the `atSize` parameter
+		 * Debug what's happening by using the `log` parameter to set different log levels
+		 */
 		async toPassDesignReview(
 			received: unknown,
-			params?: DesignReviewParams,
+			unsafeParams?: DesignReviewRun,
 		): Promise<jest.CustomMatcherResult> {
+			const { data: params, error: runValidationError } =
+				DesignReviewRunSchema.safeParse(unsafeParams);
+			if (runValidationError) {
+				return {
+					pass: false,
+					message: () =>
+						runValidationError.errors.map((e) => e.message).join("\n"),
+				};
+			}
+
 			const snapshotIdentifier = getSnapshotIdentifier(params);
 			const logger = getLogger(params?.log);
 

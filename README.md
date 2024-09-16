@@ -61,7 +61,9 @@ expect.extend(extendExpectDesignReviewer({
   // optional, sets a custom review endpoint. Override if you are self-hosting a review server
   reviewEndpoint: 'https://vslint-644118703752.us-central1.run.app/api/v1/design-review',
   // optional, sets the log level (or a custom winston logger)
-  log: 'debug'
+  log: 'debug',
+  // optional, if true will store the rendered image next to the snapshot file
+  storeRendering: false
 }));
 ```
 | Parameter                | type     | default                  | Description
