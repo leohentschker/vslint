@@ -74,7 +74,7 @@ const CHAT_SESSSION_CONFIG = {
 	responseMimeType: "application/json",
 };
 
-export const runReview = async (
+export const runGeminiReview = async (
 	renderRequest: RenderRequest,
 	imageBuffer: Buffer,
 	mimeType: "image/png",
