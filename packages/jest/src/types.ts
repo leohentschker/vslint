@@ -13,7 +13,6 @@ export type DesignReviewParams = {
 		| "3xl"
 		| { width: number; height: number };
 	log?: LoggerOptions["level"] | Logger;
-	forceReviewTest?: boolean;
 };
 
 declare global {

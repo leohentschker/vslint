@@ -2,7 +2,7 @@ import z from "zod";
 
 export const RenderRequestSchema = z.object({
 	content: z.string(),
-	styles: z.string(),
+	stylesheets: z.array(z.string()),
 	options: z.object({
 		viewport: z.object({
 			width: z.number(),

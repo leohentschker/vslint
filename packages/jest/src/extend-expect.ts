@@ -34,35 +34,42 @@ type DesignReviewResult = {
 	pass: boolean;
 };
 
+const DEFAULT_DESIGN_SNAPSHOT_DIR = "__tests__/__design_snapshots__";
+const DEFAULT_REVIEW_ENDPOINT =
+	"https://vslint-644118703752.us-central1.run.app/api/v1/design-review";
+
 export const extendExpectDesignReviewer = (args: {
-	reviewEndpoint: string;
-	snapshotsDir: string;
-	cssPath: string;
-	forceReviewAll?: boolean;
+	reviewEndpoint?: string;
+	snapshotsDir?: string;
+	customStyles: string[];
 	model: { modelName: string; key: string };
 	rules?: { ruleid: string; description: string }[];
 }) => {
-	const {
-		cssPath,
-		snapshotsDir,
-		forceReviewAll,
-		reviewEndpoint,
-		model,
-		rules,
-	} = args;
-	if (!fs.existsSync(cssPath)) {
-		throw new Error(`Could not find CSS file at path ${cssPath}`);
-	}
-	if (!fs.existsSync(snapshotsDir)) {
-		throw new Error(
-			`Could not find snapshots directory at path ${snapshotsDir}`,
-		);
+	const { customStyles, snapshotsDir, reviewEndpoint, model, rules } = args;
+	const designSnapshotsDir = snapshotsDir || DEFAULT_DESIGN_SNAPSHOT_DIR;
+	for (const cssPath of customStyles) {
+		if (!fs.existsSync(cssPath)) {
+			throw new Error(
+				`Could not find CSS file at path ${cssPath}. This file is required to correctly render your snapshots with your custom files.`,
+			);
+		}
 	}
 	if (!model?.modelName || !model?.key) {
 		throw new Error("Model name and key must be provided in the model config");
 	}
 
-	const customStyles = fs.readFileSync(cssPath, "utf8");
+	// if the snapshots directory does not exist, log and create it
+	if (!fs.existsSync(designSnapshotsDir)) {
+		fs.mkdirSync(designSnapshotsDir, { recursive: true });
+		getLogger().warn(
+			`Created snapshots directory at path ${designSnapshotsDir}`,
+		);
+	}
+
+	const stylesheets = customStyles.map((cssPath) =>
+		fs.readFileSync(cssPath, "utf8"),
+	);
+
 	return {
 		async toPassDesignReview(
 			received: unknown,
@@ -72,7 +79,7 @@ export const extendExpectDesignReviewer = (args: {
 			const logger = getLogger(params?.log);
 
 			const snapshotPath = path.join(
-				snapshotsDir,
+				designSnapshotsDir,
 				`${snapshotIdentifier}.json`,
 			);
 			logger.debug(`Snapshot path: ${snapshotPath}`);
@@ -82,17 +89,11 @@ export const extendExpectDesignReviewer = (args: {
 				logger.debug("Snapshot file exists, pulling existing data");
 			else logger.debug("Snapshot file does not exist, creating new snapshot");
 
-			const forceRereview = params?.forceReviewTest || forceReviewAll;
-			logger.debug(
-				forceRereview
-					? "Re-reviewing all snapshots."
-					: "Not forcing re-review, will check for existing snapshot changes.",
-			);
-
-			const existingSnapshot: Partial<DesignReviewResult> =
-				forceRereview || !fs.existsSync(snapshotPath)
-					? {}
-					: JSON.parse(fs.readFileSync(snapshotPath, "utf8"));
+			const existingSnapshot: Partial<DesignReviewResult> = !fs.existsSync(
+				snapshotPath,
+			)
+				? {}
+				: JSON.parse(fs.readFileSync(snapshotPath, "utf8"));
 
 			if (!elementIsHTMLElement(received)) {
 				const errorMessage =
@@ -101,10 +102,7 @@ export const extendExpectDesignReviewer = (args: {
 				return { pass: false, message: () => errorMessage };
 			}
 
-			if (
-				!forceRereview &&
-				existingSnapshot.contentHash === getContentHash(received.outerHTML)
-			) {
+			if (existingSnapshot.contentHash === getContentHash(received.outerHTML)) {
 				logger.debug(
 					`Snapshot ${snapshotPath} already exists and has the same content hash. Skipping review. To force a review, pass the option { forceReview: true } to your expect call.`,
 				);
@@ -123,9 +121,9 @@ export const extendExpectDesignReviewer = (args: {
 
 			try {
 				logger.debug("Sending request to review endpoint");
-				response = await axios.post(reviewEndpoint, {
+				response = await axios.post(reviewEndpoint || DEFAULT_REVIEW_ENDPOINT, {
 					content: received.outerHTML,
-					styles: customStyles,
+					stylesheets,
 					rules: rules || DEFAULT_RULES,
 					model,
 					options: {
