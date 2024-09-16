@@ -27,7 +27,7 @@
 		"format": "biome format --write",
 		"check": "biome check",
 		"lint": "tsc",
-		"ci": "npm run build && npm run check && npm run check-exports && npm run lint",
+		"ci": "npm run build && npm run check && npm run test && npm run check-exports && npm run lint",
 		"check-exports": "attw --pack ./packages/*",
 		"local-release": "changeset version && changeset publish",
 		"prepublishOnly": "npm run ci"

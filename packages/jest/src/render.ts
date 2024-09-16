@@ -1,4 +1,4 @@
-import type { DesignReviewParams } from "./types";
+import type { DesignReviewRun } from "./types";
 
 export const elementIsHTMLElement = (
 	element: unknown,
@@ -6,7 +6,7 @@ export const elementIsHTMLElement = (
 	return typeof element === "object" && element !== null;
 };
 export const getViewportSize = (
-	params?: DesignReviewParams,
+	params?: DesignReviewRun,
 ): { width: number; height: number } => {
 	if (!params?.atSize) {
 		return {
