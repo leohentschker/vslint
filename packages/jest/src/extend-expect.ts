@@ -40,34 +40,37 @@ export const extendExpectDesignReviewer = (args: {
 	reviewEndpoint: string;
 	snapshotsDir?: string;
 	cssPath: string;
-	forceReviewAll?: boolean;
 	model: { modelName: string; key: string };
 	rules?: { ruleid: string; description: string }[];
 }) => {
-	const {
-		cssPath,
-		snapshotsDir,
-		forceReviewAll,
-		reviewEndpoint,
-		model,
-		rules,
-	} = args;
+	const { cssPath, snapshotsDir, reviewEndpoint, model, rules } = args;
 	const designSnapshotsDir = snapshotsDir || DEFAULT_DESIGN_SNAPSHOT_DIR;
 	if (!fs.existsSync(cssPath)) {
 		throw new Error(
 			`Could not find CSS file at path ${cssPath}. This file is required to correctly render your snapshots with your custom files.`,
 		);
 	}
-	if (!fs.existsSync(designSnapshotsDir)) {
-		throw new Error(
-			`Could not find snapshots directory at path ${designSnapshotsDir}. If you want to use a different directory use the \`snapshotsDir\` option.`,
-		);
-	}
 	if (!model?.modelName || !model?.key) {
 		throw new Error("Model name and key must be provided in the model config");
 	}
 
+	// if the snapshots directory does not exist, log and create it
+	if (!fs.existsSync(designSnapshotsDir)) {
+		fs.mkdirSync(designSnapshotsDir, { recursive: true });
+		getLogger().warn(
+			`Created snapshots directory at path ${designSnapshotsDir}`,
+		);
+	}
+
 	const customStyles = fs.readFileSync(cssPath, "utf8");
+
+	const forceRereview = process.env.JEST_UPDATE_SNAPSHOT === "1";
+	if (forceRereview) {
+		getLogger().info(
+			"Forcing a review of all snapshots due to JEST_UPDATE_SNAPSHOT=1",
+		);
+	}
+
 	return {
 		async toPassDesignReview(
 			received: unknown,
@@ -86,13 +89,6 @@ export const extendExpectDesignReviewer = (args: {
 			if (snapshotFileExists)
 				logger.debug("Snapshot file exists, pulling existing data");
 			else logger.debug("Snapshot file does not exist, creating new snapshot");
-
-			const forceRereview = params?.forceReviewTest || forceReviewAll;
-			logger.debug(
-				forceRereview
-					? "Re-reviewing all snapshots."
-					: "Not forcing re-review, will check for existing snapshot changes.",
-			);
 
 			const existingSnapshot: Partial<DesignReviewResult> =
 				forceRereview || !fs.existsSync(snapshotPath)
