@@ -1,5 +1,11 @@
 # @vslint/jest
 
+## 0.2.0
+
+### Minor Changes
+
+- 055e398: Adds support for openai, big changes to calling interface
+
 ## 0.1.2
 
 ### Patch Changes
