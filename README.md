@@ -1,8 +1,10 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![npm](https://img.shields.io/npm/v/@vslint/jest)](https://www.npmjs.com/package/@vslint/jest)
-# vslint (visual eslint) - enforce design patterns in CI
+![server status](https://github.com/github/docs/actions/workflows/ci.yml/badge.svg?branch=main)
+
+# vslint (visual eslint) - use AI to enforce design patterns in CI
 ![Sample test output showing design review feedback](./assets/sample_test_output.png)
-**TLDR**: Vslint is a custom matcher for React testing frameworks that uses multi-modal AI models to enforce UI/UX patterns.
+**TLDR**: Custom matcher for React testing frameworks that uses multi-modal AI models to enforce UI/UX patterns.
 * Supports the Jest testing framework
 * Supports Gemini and OpenAI models
 * Backed by a free (but rate-limited) rendering service
@@ -18,8 +20,7 @@ expect.extend(extendExpectDesignReviewer({
   customStyles: ['./styles/globals.css'],
   // set custom UX rules, default rules are in @vslint/jest/rules
   rules: [{
-    ruleid: "text-too-wide",
-		description: "If any line of text contains more than 75 characters, mark it as true; otherwise, mark it as false.",
+    ruleid: "text-too-wide", description: "If any line of text contains more than 75 characters, mark it as true; otherwise, mark it as false.",
   }],
   // pass the calls through OpenAI's multi-modal models
   model: {
@@ -50,9 +51,9 @@ The first step is to extend jest's expect to include a new matcher that performs
 import { extendExpectDesignReviewer } from '@vslint/jest';
 
 expect.extend(extendExpectDesignReviewer({
-  // optional, where should snapshot files be stored so we don't have to call the model again every time we run tests
-  // defaults to to '__tests__/__design_snapshots__'
-  // if it doesn't exist, it will be created
+  // optional, where should snapshot files be stored so we don't have to call the model again
+  // every time we run tests. Defaults to to '__tests__/__design_snapshots__', but can can be
+  // overridden. Will be created if it doesn't exist!
   snapshotsDir: '__tests__/__design_snapshots__',
   // global CSS paths that enable correct rendering
   customStyles: ['./styles/globals.css'],

@@ -28,7 +28,11 @@ RUN npm install
 # Copy the application code
 COPY . .
 
+# Install tsup and typescript to build
 RUN npm install tsup typescript --save-dev
+
+# Install winston for logging
+RUN npm install winston
 
 # Build the TypeScript code
 RUN npm run build
