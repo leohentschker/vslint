@@ -41,12 +41,20 @@ export const DEFAULT_REVIEW_TIMEOUT = 25000;
 
 export const extendExpectDesignReviewer = (args: {
 	reviewEndpoint?: string;
+	storeRendering?: boolean;
 	snapshotsDir?: string;
 	customStyles: string[];
-	model: { modelName: string; key: string | undefined };
 	rules?: { ruleid: string; description: string }[];
+	model: { modelName: string; key: string | undefined };
 }) => {
-	const { customStyles, snapshotsDir, reviewEndpoint, model, rules } = args;
+	const {
+		storeRendering,
+		customStyles,
+		snapshotsDir,
+		reviewEndpoint,
+		model,
+		rules,
+	} = args;
 	const designSnapshotsDir = snapshotsDir || DEFAULT_DESIGN_SNAPSHOT_DIR;
 	for (const cssPath of customStyles) {
 		if (!fs.existsSync(cssPath)) {
@@ -146,7 +154,7 @@ export const extendExpectDesignReviewer = (args: {
 						`Error while sending request to review endpoint: ${axiosError.message}`,
 				};
 			}
-			const { explanation, ...violations } = response.data;
+			const { rendering, explanation, ...violations } = response.data;
 			const pass = Object.values(violations).every(
 				(checkFailed) => !checkFailed,
 			);
@@ -160,6 +168,15 @@ export const extendExpectDesignReviewer = (args: {
 			};
 			if (newSnapshot !== existingSnapshot) {
 				logger.debug(`Snapshot ${snapshotPath} has changed, updating`);
+				if (storeRendering && rendering) {
+					const renderingPath = path.join(
+						designSnapshotsDir,
+						`${snapshotIdentifier}.png`,
+					);
+					fs.writeFileSync(renderingPath, Buffer.from(rendering, "base64"));
+					logger.debug(`Saved rendering to ${renderingPath}`);
+				}
+
 				fs.writeFileSync(
 					snapshotPath,
 					JSON.stringify(
