@@ -14,13 +14,13 @@ const getBrowser = async () => {
 	return _BROWSER;
 };
 export const renderDom = async ({
-	styles,
+	stylesheets,
 	content,
 	options,
 }: RenderRequest): Promise<Option<Buffer>> => {
 	const dom = new JSDOM(content);
 	const style = dom.window.document.createElement("style");
-	style.innerHTML = styles;
+	style.innerHTML = stylesheets.join("\n");
 	dom.window.document.head.appendChild(style);
 	try {
 		const browser = await getBrowser();

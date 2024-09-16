@@ -2,8 +2,8 @@
 [![npm](https://img.shields.io/npm/v/@vslint/jest)](https://www.npmjs.com/package/@vslint/jest)
 # vslint (visual eslint) - enforce design patterns in CI
 ![Sample test output showing design review feedback](./assets/sample_test_output.png)
-**TLDR**: Vslint is a custom matcher for Javascript testing frameworks that uses multi-modal AI models to enforce UI/UX patterns in your React app.
-* Supports the Jest testing framework and respects Jest's `--updateSnapshot` and `-u` flags
+**TLDR**: Vslint is a custom matcher for React testing frameworks that uses multi-modal AI models to enforce UI/UX patterns.
+* Supports the Jest testing framework
 * Supports Gemini and OpenAI models
 * Backed by a free (but rate-limited) rendering service
 
@@ -15,12 +15,11 @@ import Button from '../src/Button'; // Adjust the import path as needed
 // extend jest's expect
 expect.extend(extendExpectDesignReviewer({
   // global CSS paths that enable correct rendering
-  cssPath: './styles/globals.css',
+  customStyles: ['./styles/globals.css'],
   // set custom UX rules, default rules are in @vslint/jest/rules
   rules: [{
     ruleid: "text-too-wide",
-		description:
-			"If any line of text contains more than 75 characters, mark it as true; otherwise, mark it as false.",
+		description: "If any line of text contains more than 75 characters, mark it as true; otherwise, mark it as false.",
   }],
   // pass the calls through OpenAI's multi-modal models
   model: {
@@ -33,7 +32,8 @@ test('text content that is too wide on desktop screens and is not legible', asyn
   const { container } = render(<div>Incredibly long content potentially too long. Human readability is best at a maximum of 75 characters</div>);
   // note that the matcher must always be async
   await expect(container).toPassDesignReview();
-});
+// setting a timeout here is important, as the model can take a while to respond
+}, 10000);
 ```
 
 ## Usage
@@ -55,7 +55,7 @@ expect.extend(extendExpectDesignReviewer({
   // if it doesn't exist, it will be created
   snapshotsDir: '__tests__/__design_snapshots__',
   // global CSS paths that enable correct rendering
-  cssPath: './styles/globals.css',
+  customStyles: ['./styles/globals.css'],
   // model config to determine which provider to use for analysis
   model: {
     modelName: 'gpt-4o-mini',
@@ -71,7 +71,7 @@ expect.extend(extendExpectDesignReviewer({
 ```
 | Parameter                | type     | default                  | Description
 | ------------------------ | -------- | ------------------------ | -------------------------------------------------------------------------------------------------------------------------- |
-| `cssPath`                  | `string`   |                          | The path to the css file that is used to generate the hash of the css file and the snapshot.
+| `customStyles`                  | `string[]`   |                          | The path to the css file that is used to generate the hash of the css file and the snapshot.
 | `model`                    | `{ modelName: string; key: string }`  |         | API credentials for the design review model. Supported models are `gpt-4o`, `gpt-4o-mini` and `gemini-1.5-flash`
 | `snapshotsDir`             | `string`   |  `__tests__/__design_snapshots__`        | The directory where the snapshots are stored.
 | `reviewEndpoint`          | `string`   | `https://vslint-644118703752.us-central1.run.app/api/v1/design-review` | The endpoint to use for the review server.
