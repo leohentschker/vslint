@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { kebabCase } from "./extend-expect";
+import { kebabCase } from "./helpers";
 
 test("kebabCase", () => {
 	expect(kebabCase("helloWorld")).toBe("hello-world");
