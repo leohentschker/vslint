@@ -1,5 +1,13 @@
 # @vslint/jest
 
+## 0.2.2
+
+### Patch Changes
+
+- 75b3f28: Swaps to a shared types package
+- Updated dependencies [31b0f4d]
+  - @vslint/shared@0.0.3
+
 ## 0.2.1
 
 ### Patch Changes
