@@ -1,6 +1,6 @@
 import * as fs from "node:fs";
 import path from "node:path";
-import type { ReviewRequest, ReviewResponse } from "@vslint/types";
+import type { ReviewRequest, ReviewResponse } from "@vslint/shared";
 import axios, { type AxiosError, type AxiosResponse } from "axios";
 import {
 	DEFAULT_DESIGN_SNAPSHOT_DIR,

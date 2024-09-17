@@ -1,4 +1,4 @@
-import { Failure, Ok, type Option, type ReviewRequest } from "@vslint/types";
+import { Failure, Ok, type Option, type ReviewRequest } from "@vslint/shared";
 import { JSDOM } from "jsdom";
 import puppeteer, { type Browser } from "puppeteer";
 

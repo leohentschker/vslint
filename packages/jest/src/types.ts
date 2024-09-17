@@ -1,4 +1,4 @@
-import { ModelSchema, RenderSizeSchema, RuleSchema } from "@vslint/types";
+import { ModelSchema, RenderSizeSchema, RuleSchema } from "@vslint/shared";
 import { Logger } from "winston";
 import { z } from "zod";
 

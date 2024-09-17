@@ -1,4 +1,4 @@
-import { Failure, Ok, type ReviewRequest } from "@vslint/types";
+import { Failure, Ok, type ReviewRequest } from "@vslint/shared";
 import OpenAI from "openai";
 import { logger } from "../logger";
 

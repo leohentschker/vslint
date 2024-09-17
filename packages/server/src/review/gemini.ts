@@ -2,7 +2,7 @@ import * as fs from "node:fs";
 import path from "node:path";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { GoogleAIFileManager } from "@google/generative-ai/server";
-import { Failure, Ok, type ReviewRequest } from "@vslint/types";
+import { Failure, Ok, type ReviewRequest } from "@vslint/shared";
 import { logger } from "../logger";
 
 const TMPFILE_DIR = "./review_images/";

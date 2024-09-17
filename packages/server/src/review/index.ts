@@ -1,4 +1,4 @@
-import type { ReviewRequest } from "@vslint/types";
+import type { ReviewRequest } from "@vslint/shared";
 import { runGeminiReview } from "./gemini";
 import { runOpenaiReview } from "./openai";
 
