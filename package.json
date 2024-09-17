@@ -2,11 +2,7 @@
 	"name": "vslint",
 	"version": "0.0.1",
 	"description": "Custom matcher for React testing frameworks that uses multi-modal AI models to enforce UI/UX patterns",
-	"keywords": [
-		"ai",
-		"design",
-		"testing"
-	],
+	"keywords": ["ai", "design", "testing"],
 	"homepage": "https://github.com/leohentschker/vslint",
 	"bugs": {
 		"url": "https://github.com/leohentschker/vslint/issues"
@@ -16,9 +12,7 @@
 		"type": "git",
 		"url": "git+https://github.com/leohentschker/vslint.git"
 	},
-	"workspaces": [
-		"packages/*"
-	],
+	"workspaces": ["packages/*"],
 	"devDependencies": {
 		"@arethetypeswrong/cli": "^0.16.2",
 		"@biomejs/biome": "1.8.3",
@@ -39,7 +33,7 @@
 		"prepublishOnly": "npm run ci"
 	},
 	"dependencies": {
-		"@vslint/shared": "^0.0.2",
+		"@vslint/shared": "workspace:*",
 		"winston": "^3.14.2"
 	}
 }
