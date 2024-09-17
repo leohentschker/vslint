@@ -22,11 +22,11 @@ jobs:
         with:
           node-version: "20"
 
+      - name: Install dependencies
+        run: npm install
+
       - name: Build shared types
         run: cd packages/shared && npm run build
-
-      - name: Install dependencies
-        run: npm install && cd packages/jest && npm install
 
       - name: Run CI
         run: npm run ci
