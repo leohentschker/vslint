@@ -6,8 +6,8 @@
 ![Sample test output showing design review feedback](./assets/sample_test_output.png)
 **TLDR**: Custom matcher for React testing frameworks that uses multi-modal AI models to enforce UI/UX patterns.
 * Supports the Jest testing framework
-* Supports Gemini and OpenAI models
-* Backed by a free (but rate-limited) rendering service
+* Uses chromium to render html snapshots
+* Supports Gemini and OpenAI models for analysis
 
 ```typescript
 import { render } from '@testing-library/react';
@@ -35,8 +35,6 @@ test('text content that is too wide on desktop screens and is not legible', asyn
 ```
 
 ## Usage
-Right now VSLint only supports the `jest` test runner.
-
 ### Jest
 ```bash
 npm install @vslint/jest --save-dev
@@ -97,13 +95,13 @@ test('render text that is too long and hard to read', async () => {
 | `atSize`                  | `string` | `{ width: number; height: number;}`   | `{ width: 1920, height: 1080 }`                    | The viewport size to render the content at. Can be `full-screen`, `mobile`, `tablet`, `sm`, `md`, `lg`, `xl`, `2xl`, `3xl`
 | `log`                     | `string` or `winston.Logger`  | `info`                    | Allows you to set a log level or pass in a custom Winston logger.
 
-## Deploying your own review server
-Deploy the dockerfile at `packages/server/Dockerfile` to a cloud provider of your choice to run your own design review server. Doing so will prevent you from hitting the rate limit of the default server and seeing slower results.
+## Deploying a review server
+Deploy the dockerfile at `packages/server/Dockerfile` to a cloud provider of your choice to run a design review server.
 
 [![Run on Google Cloud](https://deploy.cloud.run/button.svg)](https://deploy.cloud.run?git_repo=https://github.com/leohentschker/vslint&revision=main&dir=packages/server)
 
 ## Security and Privacy concerns
-VSLint supports using OpenAI and Gemini models to perform the design review. This means that your snapshots are sent to the OpenAI or Gemini API and your API key is sent to the server. If you are concerned about privacy, you should deploy your own review server and use that instead.
+VSLint supports using OpenAI and Gemini models to perform the design review. This means that snapshots are sent to the OpenAI or Gemini API and your API key is being sent to a server.
 
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

@@ -33,6 +33,7 @@
 		"prepublishOnly": "npm run ci"
 	},
 	"dependencies": {
+		"@vslint/shared": "workspace:*",
 		"winston": "^3.14.2"
 	}
 }
