@@ -1,0 +1,16 @@
+{
+	"name": "@vslint/shared",
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"author": "Leo Hentschker <lhentschker@gmail.com>",
+	"scripts": {
+		"build": "tsup"
+	},
+	"exports": {
+		"./package.json": "./package.json",
+		".": {
+			"import": "./dist/index.mjs",
+			"default": "./dist/index.js"
+		}
+	}
+}

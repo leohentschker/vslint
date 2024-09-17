@@ -1,8 +1,8 @@
+import { Failure, Ok, type ReviewRequest } from "@vslint/shared";
 import OpenAI from "openai";
 import { logger } from "../logger";
-import { Failure, Ok, type RenderRequest } from "../types";
 
-const getOpenaiClient = (modelConfig: RenderRequest["model"]) => {
+const getOpenaiClient = (modelConfig: ReviewRequest["model"]) => {
 	if (!modelConfig.key) return Failure(new Error("OPENAI_API_KEY not set"));
 	return Ok(new OpenAI({ apiKey: modelConfig.key }));
 };
@@ -14,7 +14,7 @@ Always also include a field in your response called "explanation" that explains 
 `.trim();
 
 const getChatCompletion = async (
-	renderRequest: RenderRequest,
+	renderRequest: ReviewRequest,
 	openai: OpenAI,
 	base64image: string,
 	mimeType: string,
@@ -62,7 +62,7 @@ const getChatCompletion = async (
 };
 
 export const runOpenaiReview = async (
-	renderRequest: RenderRequest,
+	renderRequest: ReviewRequest,
 	imageBuffer: Buffer,
 	mimeType: "image/png",
 ) => {

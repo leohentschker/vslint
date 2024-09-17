@@ -1,11 +1,11 @@
-import type { RenderRequest } from "../types";
+import type { ReviewRequest } from "@vslint/shared";
 import { runGeminiReview } from "./gemini";
 import { runOpenaiReview } from "./openai";
 
 const GEMINI_MODELS = ["gemini-1.5-flash"];
 
 export const runReview = async (
-	renderRequest: RenderRequest,
+	renderRequest: ReviewRequest,
 	imageBuffer: Buffer,
 	mimeType: "image/png",
 ) => {
