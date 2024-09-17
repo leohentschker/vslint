@@ -1,7 +1,7 @@
 import { expect, test } from "vitest";
 import { RuleSchema } from "./rules";
 
-test("kebabCase", () => {
+test("RuleSchema", () => {
 	expect(
 		RuleSchema.safeParse({ ruleid: "sample-id", description: "asdasdasd" })
 			.error,
