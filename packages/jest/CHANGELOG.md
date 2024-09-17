@@ -1,5 +1,11 @@
 # @vslint/jest
 
+## 0.2.3
+
+### Patch Changes
+
+- 2e4f678: Accepting fixed type refinement for rules
+
 ## 0.2.2
 
 ### Patch Changes
