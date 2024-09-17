@@ -1,5 +1,13 @@
 # @vslint/jest
 
+## 0.2.4
+
+### Patch Changes
+
+- 38628f0: QOL improvements based on usage
+- Updated dependencies [38628f0]
+  - @vslint/shared@0.0.4
+
 ## 0.2.3
 
 ### Patch Changes
