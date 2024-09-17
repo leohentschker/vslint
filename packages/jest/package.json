@@ -23,6 +23,7 @@
 		}
 	},
 	"dependencies": {
+		"@vslint/shared": "^0.0.2",
 		"axios": "^1.7.7"
 	}
 }
