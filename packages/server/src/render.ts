@@ -1,6 +1,6 @@
+import { Failure, Ok, type Option, type ReviewRequest } from "@vslint/types";
 import { JSDOM } from "jsdom";
 import puppeteer, { type Browser } from "puppeteer";
-import { Failure, Ok, type Option, type RenderRequest } from "./types";
 
 let _BROWSER: null | Browser = null;
 const getBrowser = async () => {
@@ -17,7 +17,7 @@ export const renderDom = async ({
 	stylesheets,
 	content,
 	options,
-}: RenderRequest): Promise<Option<Buffer>> => {
+}: ReviewRequest): Promise<Option<Buffer>> => {
 	const dom = new JSDOM(content);
 	const style = dom.window.document.createElement("style");
 	style.innerHTML = stylesheets.join("\n");

@@ -1,4 +1,4 @@
-import type { Rule } from "./types";
+import type { Rule } from "@vslint/types";
 
 export const DEFAULT_RULES: Rule[] = [
 	{

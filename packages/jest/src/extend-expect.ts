@@ -1,5 +1,6 @@
 import * as fs from "node:fs";
 import path from "node:path";
+import type { ReviewRequest, ReviewResponse } from "@vslint/types";
 import axios, { type AxiosError, type AxiosResponse } from "axios";
 import {
 	DEFAULT_DESIGN_SNAPSHOT_DIR,
@@ -27,12 +28,7 @@ const getSnapshotIdentifier = (params: DesignReviewRun | undefined) => {
 	);
 };
 
-type DesignReviewResult = {
-	violations: Record<string, boolean>;
-	contentHash: string;
-	explanation: string;
-	pass: boolean;
-};
+type SerializedResponse = Omit<ReviewResponse, "rendering">;
 
 /**
  * Create a new jest matcher that exposes the `toPassDesignReview` method.
@@ -114,7 +110,7 @@ export const extendExpectDesignReviewer = (unsafeArgs: DesignReviewMatcher) => {
 				logger.debug("Snapshot file exists, pulling existing data");
 			else logger.debug("Snapshot file does not exist, creating new snapshot");
 
-			const existingSnapshot: Partial<DesignReviewResult> = !fs.existsSync(
+			const existingSnapshot: Partial<SerializedResponse> = !fs.existsSync(
 				snapshotPath,
 			)
 				? {}
@@ -149,7 +145,7 @@ export const extendExpectDesignReviewer = (unsafeArgs: DesignReviewMatcher) => {
 			const viewport = getViewportSize(params);
 			logger.debug(`Viewport: ${JSON.stringify(viewport)}`);
 
-			let response: AxiosResponse;
+			let response: AxiosResponse<ReviewResponse, ReviewRequest>;
 
 			try {
 				logger.debug("Sending request to review endpoint");
@@ -179,7 +175,7 @@ export const extendExpectDesignReviewer = (unsafeArgs: DesignReviewMatcher) => {
 			);
 			logger.debug(`Review result: ${JSON.stringify(violations, null, 2)}`);
 
-			const newSnapshot = {
+			const newSnapshot: SerializedResponse = {
 				explanation,
 				violations,
 				contentHash: getContentHash(received.outerHTML),

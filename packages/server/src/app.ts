@@ -1,10 +1,10 @@
+import { ReviewRequestSchema } from "@vslint/types";
 import bodyParser from "body-parser";
 import cors from "cors";
 import express from "express";
 import { renderDom } from ".";
 import { logger } from "./logger";
 import { runReview } from "./review";
-import { RenderRequestSchema } from "./types";
 
 const port = process.env.PORT || 8080;
 const app = express();
@@ -17,7 +17,7 @@ app.post("/api/v1/design-review", async (req, res) => {
 		success: parseSuccess,
 		data: reviewRequest,
 		error: parseError,
-	} = RenderRequestSchema.safeParse(req.body);
+	} = ReviewRequestSchema.safeParse(req.body);
 	if (!parseSuccess) {
 		logger.error(`Failed to parse request: ${parseError.message}`);
 		return res.status(400).json({
