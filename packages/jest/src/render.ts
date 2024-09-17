@@ -32,6 +32,12 @@ export const getViewportSize = (
 			height: 1024,
 		};
 	}
+	if (params.atSize === "xs") {
+		return {
+			width: 320,
+			height: 568,
+		};
+	}
 	if (params.atSize === "sm") {
 		return {
 			width: 640,

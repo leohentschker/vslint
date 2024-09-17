@@ -4,7 +4,6 @@ import { z } from "zod";
 
 export const DesignReviewMatcherSchema = z.object({
 	reviewEndpoint: z.string().optional(),
-	storeRendering: z.boolean().optional(),
 	snapshotsDir: z.string().optional(),
 	customStyles: z.array(z.string()),
 	rules: z.array(RuleSchema).optional(),
@@ -13,6 +12,7 @@ export const DesignReviewMatcherSchema = z.object({
 export type DesignReviewMatcher = z.infer<typeof DesignReviewMatcherSchema>;
 
 export const DesignReviewRunSchema = z.object({
+	storeRendering: z.boolean().optional(),
 	atSize: RenderSizeSchema.optional(),
 	log: z
 		.union([

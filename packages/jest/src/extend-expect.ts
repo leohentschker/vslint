@@ -6,7 +6,8 @@ import {
 	DEFAULT_DESIGN_SNAPSHOT_DIR,
 	DEFAULT_REVIEW_ENDPOINT,
 } from "./constants";
-import { getContentHash, kebabCase } from "./helpers";
+import { getContentHash } from "./helpers";
+import { getSnapshotIdentifier } from "./jest";
 import { getLogger } from "./logging";
 import { elementIsHTMLElement, getViewportSize } from "./render";
 import { DEFAULT_RULES } from "./rules";
@@ -20,13 +21,6 @@ import {
 global.setImmediate =
 	global.setImmediate ||
 	((fn: TimerHandler, ...args: unknown[]) => global.setTimeout(fn, 0, ...args));
-
-const getSnapshotIdentifier = (params: DesignReviewRun | undefined) => {
-	const { currentTestName, testPath } = expect.getState();
-	return kebabCase(
-		`${path.basename(testPath || "")}-${currentTestName}${params?.atSize ? `-${params.atSize}` : ""}`,
-	);
-};
 
 type SerializedResponse = Omit<ReviewResponse, "rendering">;
 
@@ -48,14 +42,7 @@ export const extendExpectDesignReviewer = (unsafeArgs: DesignReviewMatcher) => {
 	if (extendValidationError) {
 		throw new Error(extendValidationError.message);
 	}
-	const {
-		storeRendering,
-		customStyles,
-		snapshotsDir,
-		reviewEndpoint,
-		model,
-		rules,
-	} = args;
+	const { customStyles, snapshotsDir, reviewEndpoint, model, rules } = args;
 	const designSnapshotsDir = snapshotsDir || DEFAULT_DESIGN_SNAPSHOT_DIR;
 	for (const cssPath of customStyles) {
 		if (!fs.existsSync(cssPath)) {
@@ -96,7 +83,10 @@ export const extendExpectDesignReviewer = (unsafeArgs: DesignReviewMatcher) => {
 				};
 			}
 
-			const snapshotIdentifier = getSnapshotIdentifier(params);
+			const snapshotIdentifier = getSnapshotIdentifier(
+				expect.getState(),
+				params,
+			);
 			const logger = getLogger(params?.log);
 
 			const snapshotPath = path.join(
@@ -185,7 +175,7 @@ export const extendExpectDesignReviewer = (unsafeArgs: DesignReviewMatcher) => {
 			};
 			if (newSnapshot !== existingSnapshot) {
 				logger.debug(`Snapshot ${snapshotPath} has changed, updating`);
-				if (storeRendering && rendering) {
+				if (params.storeRendering && rendering) {
 					const renderingPath = path.join(
 						designSnapshotsDir,
 						`${snapshotIdentifier}.png`,

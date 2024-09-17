@@ -6,6 +6,7 @@ export const RenderSizeSchema = z.union([
 		"full-screen",
 		"mobile",
 		"tablet",
+		"xs",
 		"sm",
 		"md",
 		"lg",
