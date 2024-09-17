@@ -1,5 +1,11 @@
 # @vslint/jest
 
+## 0.2.1
+
+### Patch Changes
+
+- 087670d: Adding in the storeRendering flag to see what was actually rendered on the server
+
 ## 0.2.0
 
 ### Minor Changes
