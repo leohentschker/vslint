@@ -59,9 +59,7 @@ expect.extend(extendExpectDesignReviewer({
   // optional, sets a custom review endpoint. Override if you are self-hosting a review server
   reviewEndpoint: 'https://vslint-644118703752.us-central1.run.app/api/v1/design-review',
   // optional, sets the log level (or a custom winston logger)
-  log: 'debug',
-  // optional, if true will store the rendered image next to the snapshot file
-  storeRendering: false
+  log: 'debug'
 }));
 ```
 | Parameter                | type     | default                  | Description
@@ -71,7 +69,6 @@ expect.extend(extendExpectDesignReviewer({
 | `snapshotsDir`             | `string`   |  `__tests__/__design_snapshots__`        | The directory where the snapshots are stored.
 | `reviewEndpoint`          | `string`   | `https://vslint-644118703752.us-central1.run.app/api/v1/design-review` | The endpoint to use for the review server.
 | `log`                     | `string` or `winston.Logger`  | `info`                    | Allows you to set a log level or pass in a custom Winston logger.
-| `storeRendering` | `boolean` | `false` | If `true` will also store the image rendered on the server. This parameter is useful for debugging.
 
 #### Using the design review matcher
 Now that the matcher is setup, you can use it in your tests to check if the snapshot passes design review. The `toPassDesignReview` method expects to be called on an `HTMLElement`.
@@ -85,7 +82,9 @@ test('render text that is too long and hard to read', async () => {
     // optional, sets the viewport size to render the content at
     atSize: 'md',
     // optional, sets the log level (or a custom winston logger)
-    log: 'debug'
+    log: 'debug',
+    // optional, if true will store the rendered image next to the snapshot file
+    storeRendering: false
   });
 });
 ```
@@ -94,6 +93,7 @@ test('render text that is too long and hard to read', async () => {
 | ------------------------ | -------- | ------------------------ | -------------------------------------------------------------------------------------------------------------------------- |
 | `atSize`                  | `string` | `{ width: number; height: number;}`   | `{ width: 1920, height: 1080 }`                    | The viewport size to render the content at. Can be `full-screen`, `mobile`, `tablet`, `sm`, `md`, `lg`, `xl`, `2xl`, `3xl`
 | `log`                     | `string` or `winston.Logger`  | `info`                    | Allows you to set a log level or pass in a custom Winston logger.
+| `storeRendering` | `boolean` | `false` | If `true` will also store the image rendered on the server. This parameter is useful for debugging.
 
 ## Deploying a review server
 Deploy the dockerfile at `packages/server/Dockerfile` to run a design review server
