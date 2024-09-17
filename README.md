@@ -96,8 +96,9 @@ test('render text that is too long and hard to read', async () => {
 | `log`                     | `string` or `winston.Logger`  | `info`                    | Allows you to set a log level or pass in a custom Winston logger.
 
 ## Deploying a review server
-Deploy the dockerfile at `packages/server/Dockerfile` to run a design review server or 
+Deploy the dockerfile at `packages/server/Dockerfile` to run a design review server
 ### Deploying to Google Cloud
+Deploy on Google Cloud:
 [![Run on Google Cloud](https://deploy.cloud.run/button.svg)](https://deploy.cloud.run?git_repo=https://github.com/leohentschker/vslint&revision=main&dir=packages/server)
 
 ### Running in your existing backend
