@@ -35,7 +35,7 @@ RUN npm install tsup typescript --save-dev
 RUN npm install winston
 
 # Install the shared types package
-RUN npm install ../shared
+RUN npm install @vslint/shared
 
 # Build the TypeScript code
 RUN npm run build
