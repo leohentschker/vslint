@@ -138,7 +138,9 @@ export const extendExpectDesignReviewer = (unsafeArgs: DesignReviewMatcher) => {
 
 			if (!model?.modelName || !model?.key) {
 				throw new Error(
-					"Component changed but can't re-run review as model name and key are not correctly set in `extendExpectDesignReviewer`. If you are setting the model key with an environment variable, make sure that `process.env.OPENAI_API_KEY` or `process.env.GEMINI_API_KEY` is set by running export OPENAI_API_KEY=...",
+					process.env.CI
+						? "vslint is running in a CI environment but the design snapshot does not exist for this test. vslint should never generate snapshots in CI as this could cause unintended model usage. Make sure to run this test locally and commit the results so re-review doesn't happen in CI."
+						: "Component changed but can't re-run review as model name and key are not correctly set in `extendExpectDesignReviewer`. If you are setting the model key with an environment variable, make sure that `process.env.OPENAI_API_KEY` or `process.env.GEMINI_API_KEY` is set by running export OPENAI_API_KEY=...",
 				);
 			}
 
