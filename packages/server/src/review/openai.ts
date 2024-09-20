@@ -1,6 +1,12 @@
 import { Failure, Ok, type ReviewRequest } from "@vslint/shared";
 import OpenAI from "openai";
+import { z } from "zod";
 import { logger } from "../logger";
+
+const OpenaiResponseSchema = z.object({
+	explanation: z.string().optional(),
+	failed: z.boolean(),
+});
 
 const getOpenaiClient = (modelConfig: ReviewRequest["model"]) => {
 	if (!modelConfig.key) return Failure(new Error("OPENAI_API_KEY not set"));
@@ -8,14 +14,19 @@ const getOpenaiClient = (modelConfig: ReviewRequest["model"]) => {
 };
 
 const BASE_OPENAI_SYSTEM_PROMPT = `
-You are an AI assistant working as a senior designer to review website designs and provide feedback in JSON format.
-You review a rule and and an image. If the test fails the rule and is problematic, return true. If the test fails the rule, return false.
-Always include a field called "explanation" in your response. If the test failed, explain why. If it passed, set this field to null.
-YOU ARE A SENIOR DESIGNER THAT CARES A LOT ABOUT DESIGN QUALITY AND DOES NOT MISS ANY DETAIL.
+You are an AI assistant working as a senior designer to reviews website components and provide feedback on their design.
+
+You take two inputs:
+1. Rule: The rule to evaluate the component against.
+2. Image: A screenshot of the component in Chrome.
+
+You need to evaluate the component against the rule and provide feedback on the design to be run in a CI pipeline.
+
+YOU ARE A SENIOR DESIGNER THAT CARES A LOT ABOUT DESIGN QUALITY AND DOES NOT MISS ANY DETAIL. WHEN YOU GIVE FEEDBACK IT SHOULD BE VERY DETAILED AND INCLUDE EXPLANATIONS IN THE CONTEXT OF THE SPECIFIC HTML PASSED IN.
 `.trim();
 
 const getChatCompletion = async (
-	modelName: ReviewRequest["model"]["modelName"],
+	reviewRequest: ReviewRequest,
 	rule: ReviewRequest["rules"][number],
 	openai: OpenAI,
 	base64image: string,
@@ -23,20 +34,16 @@ const getChatCompletion = async (
 ) => {
 	let completion: OpenAI.Chat.ChatCompletion;
 	try {
-		const userPrompt = `${BASE_OPENAI_SYSTEM_PROMPT}\n\nReturn in format: { explanation: string; ${rule.ruleid}: string | null; }.\n\nHere is the rule you are evaluating:\n## ${rule.ruleid}\n${rule.description}`;
+		const userPrompt = `${BASE_OPENAI_SYSTEM_PROMPT}\n\nReturn in JSON format: { explanation: string; failed: boolean; }.\n\nHere is the rule you are evaluating:\n## ${rule.ruleid}\n${rule.description}`;
 		logger.debug("Creating OpenAI chat completion");
 		completion = await openai.chat.completions.create({
-			model: modelName,
+			model: reviewRequest.model.modelName,
 			response_format: {
 				type: "json_object",
 			},
 			temperature: 0,
 			seed: 42,
 			messages: [
-				{
-					role: "system",
-					content: userPrompt,
-				},
 				{
 					role: "user",
 					content: [
@@ -49,6 +56,10 @@ const getChatCompletion = async (
 						},
 					],
 				},
+				{
+					role: "system",
+					content: userPrompt,
+				},
 			],
 		});
 	} catch (error) {
@@ -57,7 +68,15 @@ const getChatCompletion = async (
 	}
 	const result = completion.choices[0]?.message.content;
 	if (!result) return Failure(new Error("No result from OpenAI"));
-	return Ok(JSON.parse(result));
+	const parsedResult = OpenaiResponseSchema.safeParse(JSON.parse(result));
+	if (!parsedResult.success) {
+		logger.error(parsedResult.error);
+		return Failure(new Error("Failed to parse OpenAI response"));
+	}
+	return Ok({
+		...parsedResult.data,
+		ruleid: rule.ruleid,
+	});
 };
 
 export const runOpenaiReview = async (
@@ -74,7 +93,7 @@ export const runOpenaiReview = async (
 	const completionResults = await Promise.all(
 		renderRequest.rules.map(async (rule) => {
 			const { response: result, error: openaiError } = await getChatCompletion(
-				renderRequest.model.modelName,
+				renderRequest,
 				rule,
 				openai,
 				base64Content,
@@ -93,10 +112,11 @@ export const runOpenaiReview = async (
 		error: completionError,
 	} of completionResults) {
 		if (completionError) return Failure(completionError);
-		for (const [key, value] of Object.entries(completion)) {
-			if (key === "explanation" && !value) continue;
-			results[key] = value as string;
+		const { explanation, failed, ruleid } = completion;
+		if (failed && explanation) {
+			results.explanation = explanation;
 		}
+		results[ruleid] = failed;
 	}
 
 	logger.debug(`OpenAI response: ${JSON.stringify(results)}`);
