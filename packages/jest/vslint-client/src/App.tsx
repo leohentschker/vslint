@@ -1,26 +1,22 @@
-import { StrictMode } from 'react'
-import { RouterProvider, createRouter } from '@tanstack/react-router'
+import { RouterProvider, createRouter } from "@tanstack/react-router";
+import { StrictMode } from "react";
+import { TooltipProvider } from "./components/ui/tooltip";
+import { routeTree } from "./routeTree.gen";
 
-// Import the generated route tree
-import { routeTree } from './routeTree.gen'
-import { TooltipProvider } from './components/ui/tooltip'
+const router = createRouter({ routeTree });
 
-// Create a new router instance
-const router = createRouter({ routeTree })
-
-// Register the router instance for type safety
-declare module '@tanstack/react-router' {
-  interface Register {
-    router: typeof router
-  }
+declare module "@tanstack/react-router" {
+	interface Register {
+		router: typeof router;
+	}
 }
 
 export default function App() {
-  return (
-    <StrictMode>
-      <TooltipProvider>
-        <RouterProvider router={router} />
-      </TooltipProvider>
-    </StrictMode>
-  )
+	return (
+		<StrictMode>
+			<TooltipProvider>
+				<RouterProvider router={router} />
+			</TooltipProvider>
+		</StrictMode>
+	);
 }
