@@ -13,5 +13,8 @@
 		"useIgnoreFile": true,
 		"enabled": true,
 		"clientKind": "git"
+	},
+	"files": {
+		"ignore": ["**/routeTree.gen.ts", "**/vite.config.ts"]
 	}
 }

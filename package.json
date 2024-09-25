@@ -22,7 +22,7 @@
 		"vitest": "^2.0.5"
 	},
 	"scripts": {
-		"build": "cd packages/jest && npm run build && cd ../shared && npm run build",
+		"build": "cd packages/jest && npm run build && cd vslint-client && npm run build && cd ../../shared && npm run build",
 		"test": "vitest run",
 		"format": "biome format --write",
 		"check": "biome check",
