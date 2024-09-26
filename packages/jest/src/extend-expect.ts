@@ -9,6 +9,7 @@ import {
 import { getContentHash } from "./helpers";
 import { getSnapshotIdentifier } from "./jest";
 import { getLogger } from "./logging";
+import { markdownToReviewResponse, reviewResponseToMarkdown } from "./markdown";
 import { elementIsHTMLElement, getViewportSize } from "./render";
 import { DEFAULT_RULES } from "./rules";
 import {
@@ -17,7 +18,6 @@ import {
 	type DesignReviewRun,
 	DesignReviewRunSchema,
 } from "./types";
-import { markdownToReviewResponse, reviewResponseToMarkdown } from "./markdown";
 
 global.setImmediate =
 	global.setImmediate ||
@@ -106,8 +106,12 @@ export const extendExpectDesignReviewer = (unsafeArgs: DesignReviewMatcher) => {
 				return { pass: false, message: () => errorMessage };
 			}
 
-			const existingSnapshotFileContent = fs.existsSync(snapshotPath) && fs.readFileSync(snapshotPath, "utf8");
-			const existingSnapshot: Partial<ReviewResponse> = existingSnapshotFileContent ? markdownToReviewResponse(existingSnapshotFileContent) : {};
+			const existingSnapshotFileContent =
+				fs.existsSync(snapshotPath) && fs.readFileSync(snapshotPath, "utf8");
+			const existingSnapshot: Partial<ReviewResponse> =
+				existingSnapshotFileContent
+					? markdownToReviewResponse(existingSnapshotFileContent)
+					: {};
 
 			if (existingSnapshot.contentHash === getContentHash(received.outerHTML)) {
 				logger.debug(
@@ -147,9 +151,12 @@ export const extendExpectDesignReviewer = (unsafeArgs: DesignReviewMatcher) => {
 					},
 					testDetails: {
 						name: expect.getState().currentTestName || "",
-					}
+					},
 				};
-				response = await axios.post(reviewEndpoint || DEFAULT_REVIEW_ENDPOINT, requestData);
+				response = await axios.post(
+					reviewEndpoint || DEFAULT_REVIEW_ENDPOINT,
+					requestData,
+				);
 			} catch (err) {
 				const axiosError = err as AxiosError;
 				logger.error(
@@ -162,16 +169,28 @@ export const extendExpectDesignReviewer = (unsafeArgs: DesignReviewMatcher) => {
 				};
 			}
 			const { content, explanation, pass, ...violations } = response.data;
-			logger.debug(`Review result: ${JSON.stringify(violations, null, 2)}. Explanation: ${explanation}`);
+			logger.debug(
+				`Review result: ${JSON.stringify(violations, null, 2)}. Explanation: ${explanation}`,
+			);
 
 			const imageSnapshotPath = path.join(
 				designSnapshotsDir,
 				`${snapshotIdentifier}.png`,
 			);
-			fs.writeFileSync(imageSnapshotPath, Buffer.from(response.data.content, "base64"));
+			fs.writeFileSync(
+				imageSnapshotPath,
+				Buffer.from(response.data.content, "base64"),
+			);
 
-			const reviewMarkdown = reviewResponseToMarkdown(response.data, imageSnapshotPath);
-			if (!existingSnapshotFileContent || getContentHash(reviewMarkdown) !== getContentHash(existingSnapshotFileContent)) {
+			const reviewMarkdown = reviewResponseToMarkdown(
+				response.data,
+				imageSnapshotPath,
+			);
+			if (
+				!existingSnapshotFileContent ||
+				getContentHash(reviewMarkdown) !==
+					getContentHash(existingSnapshotFileContent)
+			) {
 				logger.debug(`Snapshot ${snapshotPath} has changed, updating`);
 				fs.writeFileSync(snapshotPath, reviewMarkdown);
 			} else {

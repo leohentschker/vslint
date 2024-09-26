@@ -32,6 +32,6 @@ export const ReviewResponseSchema = z.object({
 		width: z.number(),
 		height: z.number(),
 	}),
-	pass: z.boolean()
+	pass: z.boolean(),
 });
 export type ReviewResponse = z.infer<typeof ReviewResponseSchema>;

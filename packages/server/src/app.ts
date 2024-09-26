@@ -57,8 +57,11 @@ app.post("/api/v1/design-review", async (req, res) => {
 		content,
 		viewport: reviewRequest.options.viewport,
 		name: reviewRequest.testDetails.name,
-		contentHash: crypto.createHash("md5").update(reviewRequest.content).digest("hex"),
-		pass
+		contentHash: crypto
+			.createHash("md5")
+			.update(reviewRequest.content)
+			.digest("hex"),
+		pass,
 	};
 	res.json(response);
 });

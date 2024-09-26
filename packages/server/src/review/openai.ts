@@ -110,7 +110,7 @@ export const runOpenaiReview = async (
 	);
 
 	const violations: ReviewResponse["violations"] = {};
-	let failedExplanations = [];
+	const failedExplanations = [];
 	for (const {
 		response: completion,
 		error: completionError,
@@ -126,7 +126,9 @@ export const runOpenaiReview = async (
 		}
 		violations[ruleid] = { fail, rule };
 	}
-	const explanation = failedExplanations.length ? failedExplanations.join("\n\n") : 'Design review passed.';
+	const explanation = failedExplanations.length
+		? failedExplanations.join("\n\n")
+		: "Design review passed.";
 
 	logger.debug(`OpenAI response: ${JSON.stringify(violations)}`);
 	logger.debug(`OpenAI explanation: ${explanation}`);
