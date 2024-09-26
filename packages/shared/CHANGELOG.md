@@ -1,5 +1,11 @@
 # @vslint/shared
 
+## 0.0.7
+
+### Patch Changes
+
+- 77c8431: Fix build
+
 ## 0.0.6
 
 ### Patch Changes

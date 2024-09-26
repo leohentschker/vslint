@@ -1,5 +1,11 @@
 # @vslint/server
 
+## 0.2.2
+
+### Patch Changes
+
+- 77c8431: Fix build
+
 ## 0.2.1
 
 ### Patch Changes
