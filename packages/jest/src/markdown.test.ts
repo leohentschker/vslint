@@ -1,5 +1,5 @@
 import { markdownToReviewResponse } from "./markdown";
-import { expect, test, it } from "vitest";
+import { expect, test } from "vitest";
 
 const SAMPLE_REVIEW_RESPONSE = `
 # SearchBox should render
