@@ -89,10 +89,10 @@ export const markdownToReviewResponse = (
 		: { width: 0, height: 0 };
 	const pass =
 		lines
-			.find((line) => line.startsWith("**Pass: "))
-			?.replace("Pass: ", "")
+			.find((line) => line.startsWith("**Pass:**"))
+			?.replace("**Pass:** ", "")
+			.replace(/\`/g, "")
 			.trim() === "true";
-
 	const violations: ReviewResponse["violations"] = {};
 	for (const rule of passedRules) {
 		violations[rule.ruleid] = {

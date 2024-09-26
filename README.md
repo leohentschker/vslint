@@ -8,6 +8,7 @@
 * Supports the Jest testing framework
 * Uses chromium to render html snapshots
 * Supports Gemini and OpenAI models for analysis
+* Creates snapshot files in Markdown format to store the results of automated testing
 
 ```typescript
 import { render } from '@testing-library/react';
