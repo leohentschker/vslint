@@ -21,14 +21,11 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { TypographyH2 } from "@/components/ui/typography";
-import {
-	type TestFixture,
-	TestFixtureSchema,
-	TestSnapshotSchema,
-} from "@/lib/utils";
+import { type TestFixture, TestFixtureSchema } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
+import { ReviewResponseSchema } from "@vslint/shared";
 import { useEffect, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 
@@ -90,7 +87,7 @@ function TabContent({
 
 function TestFixtureDetail({ testFixture }: { testFixture: TestFixture }) {
 	const form = useForm<TestFixture["snapshot"]>({
-		resolver: zodResolver(TestSnapshotSchema),
+		resolver: zodResolver(ReviewResponseSchema),
 		defaultValues: testFixture.snapshot,
 		mode: "onChange",
 	});

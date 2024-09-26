@@ -21,6 +21,7 @@
 		"@radix-ui/react-tabs": "^1.1.0",
 		"@radix-ui/react-tooltip": "^1.1.2",
 		"@tanstack/react-router": "^1.58.3",
+		"@vslint/shared": "file:../../shared",
 		"class-variance-authority": "^0.7.0",
 		"clsx": "^2.1.1",
 		"lucide-react": "^0.445.0",

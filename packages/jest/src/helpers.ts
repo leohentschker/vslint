@@ -6,5 +6,5 @@ export const kebabCase = (str: string) =>
 		.replace(/[\s_]+/g, "-")
 		.toLowerCase();
 export const getContentHash = (content: string) => {
-	return crypto.createHash("sha256").update(content).digest("hex");
+	return crypto.createHash("md5").update(content).digest("hex");
 };

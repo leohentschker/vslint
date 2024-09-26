@@ -1,11 +1,16 @@
-import { Failure, Ok, type ReviewRequest } from "@vslint/shared";
+import {
+	Failure,
+	Ok,
+	type ReviewRequest,
+	type ReviewResponse,
+} from "@vslint/shared";
 import OpenAI from "openai";
 import { z } from "zod";
 import { logger } from "../logger";
 
 const OpenaiResponseSchema = z.object({
 	explanation: z.string().optional(),
-	failed: z.boolean(),
+	fail: z.boolean(),
 });
 
 const getOpenaiClient = (modelConfig: ReviewRequest["model"]) => {
@@ -34,7 +39,7 @@ const getChatCompletion = async (
 ) => {
 	let completion: OpenAI.Chat.ChatCompletion;
 	try {
-		const userPrompt = `${BASE_OPENAI_SYSTEM_PROMPT}\n\nReturn in JSON format: { explanation: string; failed: boolean; }.\n\nHere is the rule you are evaluating:\n## ${rule.ruleid}\n${rule.description}`;
+		const userPrompt = `${BASE_OPENAI_SYSTEM_PROMPT}\n\nReturn in JSON format: { explanation: string; fail: boolean; }.\n\nHere is the rule you are evaluating:\n## ${rule.ruleid}\n${rule.description}`;
 		logger.debug("Creating OpenAI chat completion");
 		completion = await openai.chat.completions.create({
 			model: reviewRequest.model.modelName,
@@ -75,7 +80,7 @@ const getChatCompletion = async (
 	}
 	return Ok({
 		...parsedResult.data,
-		ruleid: rule.ruleid,
+		rule,
 	});
 };
 
@@ -104,21 +109,28 @@ export const runOpenaiReview = async (
 		}),
 	);
 
-	const results: Record<string, boolean | null | string> = {
-		explanation: null,
-	};
+	const violations: ReviewResponse["violations"] = {};
+	const failedExplanations = [];
 	for (const {
 		response: completion,
 		error: completionError,
 	} of completionResults) {
 		if (completionError) return Failure(completionError);
-		const { explanation, failed, ruleid } = completion;
-		if (failed && explanation) {
-			results.explanation = explanation;
+		const {
+			explanation: failExplanation,
+			fail,
+			rule: { ruleid, description: rule },
+		} = completion;
+		if (fail && failExplanation) {
+			failedExplanations.push(failExplanation);
 		}
-		results[ruleid] = failed;
+		violations[ruleid] = { fail, rule };
 	}
+	const explanation = failedExplanations.length
+		? failedExplanations.join("\n\n")
+		: "Design review passed.";
 
-	logger.debug(`OpenAI response: ${JSON.stringify(results)}`);
-	return Ok(results);
+	logger.debug(`OpenAI response: ${JSON.stringify(violations)}`);
+	logger.debug(`OpenAI explanation: ${explanation}`);
+	return Ok({ violations, explanation });
 };

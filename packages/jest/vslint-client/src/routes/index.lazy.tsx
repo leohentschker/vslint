@@ -31,7 +31,6 @@ function TestsTable({
 }: {
 	testFixtures: TestFixture[];
 }) {
-	console.log(testFixtures, "TEST FIXTURES");
 	return (
 		<>
 			<div className="flex justify-between border-b">

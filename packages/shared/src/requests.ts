@@ -10,14 +10,28 @@ export const ReviewRequestSchema = z.object({
 	options: z.object({
 		viewport: z.object({ width: z.number(), height: z.number() }),
 	}),
+	testDetails: z.object({
+		name: z.string(),
+	}),
 });
 export type ReviewRequest = z.infer<typeof ReviewRequestSchema>;
 
 export const ReviewResponseSchema = z.object({
-	explanation: z.string().optional().nullable(),
+	explanation: z.string().optional(),
 	contentHash: z.string(),
-	violations: z.any(),
-	rendering: z.string(),
+	violations: z.record(
+		z.string(),
+		z.object({
+			fail: z.boolean(),
+			rule: z.string(),
+		}),
+	),
+	name: z.string(),
+	content: z.string(),
+	viewport: z.object({
+		width: z.number(),
+		height: z.number(),
+	}),
 	pass: z.boolean(),
 });
 export type ReviewResponse = z.infer<typeof ReviewResponseSchema>;

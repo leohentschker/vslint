@@ -9,6 +9,7 @@ import {
 import { getContentHash } from "./helpers";
 import { getSnapshotIdentifier } from "./jest";
 import { getLogger } from "./logging";
+import { markdownToReviewResponse, reviewResponseToMarkdown } from "./markdown";
 import { elementIsHTMLElement, getViewportSize } from "./render";
 import { DEFAULT_RULES } from "./rules";
 import {
@@ -21,8 +22,6 @@ import {
 global.setImmediate =
 	global.setImmediate ||
 	((fn: TimerHandler, ...args: unknown[]) => global.setTimeout(fn, 0, ...args));
-
-type SerializedResponse = Omit<ReviewResponse, "rendering">;
 
 /**
  * Create a new jest matcher that exposes the `toPassDesignReview` method.
@@ -91,7 +90,7 @@ export const extendExpectDesignReviewer = (unsafeArgs: DesignReviewMatcher) => {
 
 			const snapshotPath = path.join(
 				designSnapshotsDir,
-				`${snapshotIdentifier}.json`,
+				`${snapshotIdentifier}.md`,
 			);
 			logger.debug(`Snapshot path: ${snapshotPath}`);
 
@@ -100,18 +99,19 @@ export const extendExpectDesignReviewer = (unsafeArgs: DesignReviewMatcher) => {
 				logger.debug("Snapshot file exists, pulling existing data");
 			else logger.debug("Snapshot file does not exist, creating new snapshot");
 
-			const existingSnapshot: Partial<SerializedResponse> = !fs.existsSync(
-				snapshotPath,
-			)
-				? {}
-				: JSON.parse(fs.readFileSync(snapshotPath, "utf8"));
-
 			if (!elementIsHTMLElement(received)) {
 				const errorMessage =
 					"Received invalid value for element. Make sure that you pass a HTMLElement object into your expect call! This should look like:\nconst { container } = render(...);\nexpect(container).toPassDesignReview();";
 				logger.error(errorMessage);
 				return { pass: false, message: () => errorMessage };
 			}
+
+			const existingSnapshotFileContent =
+				fs.existsSync(snapshotPath) && fs.readFileSync(snapshotPath, "utf8");
+			const existingSnapshot: Partial<ReviewResponse> =
+				existingSnapshotFileContent
+					? markdownToReviewResponse(existingSnapshotFileContent)
+					: {};
 
 			if (existingSnapshot.contentHash === getContentHash(received.outerHTML)) {
 				logger.debug(
@@ -122,7 +122,7 @@ export const extendExpectDesignReviewer = (unsafeArgs: DesignReviewMatcher) => {
 					message: () =>
 						existingSnapshot.pass
 							? "Snapshot passed design review"
-							: `Snapshot failed design review. ${existingSnapshot.explanation}`,
+							: `Snapshot failed design review.\n${existingSnapshot.explanation}\n\nTo override this, update the value of pass to true in ${snapshotPath}`,
 				};
 			}
 
@@ -141,7 +141,7 @@ export const extendExpectDesignReviewer = (unsafeArgs: DesignReviewMatcher) => {
 
 			try {
 				logger.debug("Sending request to review endpoint");
-				response = await axios.post(reviewEndpoint || DEFAULT_REVIEW_ENDPOINT, {
+				const requestData: ReviewRequest = {
 					content: received.outerHTML,
 					stylesheets,
 					rules: rules || DEFAULT_RULES,
@@ -149,7 +149,14 @@ export const extendExpectDesignReviewer = (unsafeArgs: DesignReviewMatcher) => {
 					options: {
 						viewport,
 					},
-				});
+					testDetails: {
+						name: expect.getState().currentTestName || "",
+					},
+				};
+				response = await axios.post(
+					reviewEndpoint || DEFAULT_REVIEW_ENDPOINT,
+					requestData,
+				);
 			} catch (err) {
 				const axiosError = err as AxiosError;
 				logger.error(
@@ -161,42 +168,31 @@ export const extendExpectDesignReviewer = (unsafeArgs: DesignReviewMatcher) => {
 						`Error while sending request to review endpoint: ${axiosError.message}`,
 				};
 			}
-			const { rendering, explanation, ...violations } = response.data;
-			const pass = Object.values(violations).every(
-				(checkFailed) => !checkFailed,
+			const { content, explanation, pass, ...violations } = response.data;
+			logger.debug(
+				`Review result: ${JSON.stringify(violations, null, 2)}. Explanation: ${explanation}`,
 			);
-			logger.debug(`Review result: ${JSON.stringify(violations, null, 2)}`);
 
-			const newSnapshot: SerializedResponse = {
-				explanation,
-				violations,
-				contentHash: getContentHash(received.outerHTML),
-				pass,
-			};
-			if (newSnapshot !== existingSnapshot) {
+			const imageSnapshotPath = path.join(
+				designSnapshotsDir,
+				`${snapshotIdentifier}.png`,
+			);
+			fs.writeFileSync(
+				imageSnapshotPath,
+				Buffer.from(response.data.content, "base64"),
+			);
+
+			const reviewMarkdown = reviewResponseToMarkdown(
+				response.data,
+				imageSnapshotPath,
+			);
+			if (
+				!existingSnapshotFileContent ||
+				getContentHash(reviewMarkdown) !==
+					getContentHash(existingSnapshotFileContent)
+			) {
 				logger.debug(`Snapshot ${snapshotPath} has changed, updating`);
-				if (params.storeRendering && rendering) {
-					const renderingPath = path.join(
-						designSnapshotsDir,
-						`${snapshotIdentifier}.png`,
-					);
-					fs.writeFileSync(renderingPath, Buffer.from(rendering, "base64"));
-					logger.debug(`Saved rendering to ${renderingPath}`);
-				}
-
-				fs.writeFileSync(
-					snapshotPath,
-					JSON.stringify(
-						{
-							explanation,
-							violations,
-							contentHash: getContentHash(received.outerHTML),
-							pass,
-						},
-						null,
-						2,
-					),
-				);
+				fs.writeFileSync(snapshotPath, reviewMarkdown);
 			} else {
 				logger.debug(
 					`Snapshot ${snapshotPath} has not changed, skipping update`,
@@ -206,7 +202,7 @@ export const extendExpectDesignReviewer = (unsafeArgs: DesignReviewMatcher) => {
 			const message = () =>
 				pass
 					? "Automated review successful"
-					: `Design review failed: ${explanation}`;
+					: `Design review failed: ${explanation}\n\nTo override this, update the value of pass to true in ${snapshotPath}`;
 			return {
 				message,
 				pass,

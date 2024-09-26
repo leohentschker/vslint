@@ -26,7 +26,10 @@ export const renderDom = async ({
 		const browser = await getBrowser();
 		const page = await browser.newPage();
 		await page.setContent(dom.serialize());
-		await page.setViewport(options.viewport);
+		await page.setViewport({
+			...options.viewport,
+			deviceScaleFactor: 2,
+		});
 		const pageScreenshot = await page.screenshot({ type: "png" });
 		await page.close();
 		return Ok(Buffer.from(pageScreenshot));
