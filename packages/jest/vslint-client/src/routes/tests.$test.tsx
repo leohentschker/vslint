@@ -21,32 +21,30 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { TypographyH2 } from "@/components/ui/typography";
+import {
+	type TestFixture,
+	TestFixtureSchema,
+	TestSnapshotSchema,
+} from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
-import { z } from "zod";
-
-const FormSchema = z.object({
-	explanation: z.string().optional(),
-	contentHash: z.string(),
-	violations: z.record(z.string(), z.boolean()),
-	pass: z.boolean(),
-});
 
 export const Route = createFileRoute("/tests/$test")({
-	component: PostComponent,
+	component: TestFixtureDetailContainer,
 });
 
 function TabContent({
-	includePassValues,
+	includeViolationValues,
 	value,
 	form,
 }: {
-	includePassValues: boolean[];
+	includeViolationValues: boolean[];
 	value: string;
-	violations: Record<string, boolean>;
-	form: ReturnType<typeof useForm<z.infer<typeof FormSchema>>>;
+	violations: TestFixture["snapshot"]["violations"];
+	form: ReturnType<typeof useForm<TestFixture["snapshot"]>>;
 }) {
 	const violations = useWatch({
 		control: form.control,
@@ -54,7 +52,7 @@ function TabContent({
 	});
 	// Ensure that violations is an object to avoid errors
 	const violationKeys = Object.keys(violations || {}).filter((key) =>
-		includePassValues.includes(violations[key]),
+		includeViolationValues.includes(violations[key].fail),
 	);
 
 	return (
@@ -65,13 +63,13 @@ function TabContent({
 						<FormField
 							key={violationKey}
 							control={form.control}
-							name={`violations.${violationKey}`}
+							name={`violations.${violationKey}.fail`}
 							render={({ field }) => (
 								<FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
 									<div className="space-y-0.5">
 										<FormLabel>{violationKey}</FormLabel>
 										<FormDescription>
-											Receive emails about your account security.
+											{violations[violationKey].rule}
 										</FormDescription>
 									</div>
 									<FormControl>
@@ -90,33 +88,23 @@ function TabContent({
 	);
 }
 
-function PostComponent() {
-	const initialData = {
-		violations: {
-			"text-too-wide": false,
-			"bad-gray-text": true,
-		},
-		pass: true,
-		explanation: "More things to check",
-		contentHash:
-			"44275f8ca9597f6bd896c5319e95d85a2e21ddc5b68ed3e994e23ef54388260d",
-	};
-	const form = useForm<z.infer<typeof FormSchema>>({
-		resolver: zodResolver(FormSchema),
-		defaultValues: initialData,
+function TestFixtureDetail({ testFixture }: { testFixture: TestFixture }) {
+	const form = useForm<TestFixture["snapshot"]>({
+		resolver: zodResolver(TestSnapshotSchema),
+		defaultValues: testFixture.snapshot,
 		mode: "onChange",
 	});
 
-	// 2. Define a submit handler.
-	function onSubmit(values: z.infer<typeof FormSchema>) {
-		// Do something with the form values.
-		// ✅ This will be type-safe and validated.
-		console.log(values);
-		console.log("WUT");
+	function onSubmit(values: TestFixture["snapshot"]) {
+		fetch(`http://localhost:8082/tests/${testFixture.file}/update`, {
+			method: "POST",
+			mode: "cors",
+			body: JSON.stringify({
+				file: testFixture.file,
+				snapshot: values,
+			}),
+		}).then((d) => console.log(d));
 	}
-
-	// In a component!
-	const { test } = Route.useParams();
 
 	return (
 		<>
@@ -129,7 +117,7 @@ function PostComponent() {
 					</BreadcrumbItem>
 					<BreadcrumbSeparator />
 					<BreadcrumbItem>
-						<BreadcrumbPage>{test}</BreadcrumbPage>
+						<BreadcrumbPage>{testFixture.file}</BreadcrumbPage>
 					</BreadcrumbItem>
 				</BreadcrumbList>
 			</Breadcrumb>
@@ -137,12 +125,20 @@ function PostComponent() {
 			<Form {...form}>
 				<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
 					<div className="flex justify-between border-b">
-						<TypographyH2>{test}</TypographyH2>
+						<TypographyH2>{testFixture.snapshot.name}</TypographyH2>
 						<Button type="submit" disabled={!form.formState.isValid}>
 							Save Snapshot
 						</Button>
 					</div>
-
+					<div>
+						<img
+							src={testFixture.snapshot.content}
+							width={testFixture.snapshot.viewport.width}
+							height={testFixture.snapshot.viewport.height}
+							className="mx-auto"
+							aria-label="Test snapshot"
+						/>
+					</div>
 					<FormField
 						control={form.control}
 						name="contentHash"
@@ -178,25 +174,53 @@ function PostComponent() {
 						</TabsList>
 						<TabContent
 							value="all"
-							violations={initialData.violations}
+							violations={testFixture.snapshot.violations}
 							form={form}
-							includePassValues={[true, false]}
+							includeViolationValues={[true, false]}
 						/>
 						<TabContent
 							value="failing"
-							violations={initialData.violations}
+							violations={testFixture.snapshot.violations}
 							form={form}
-							includePassValues={[false]}
+							includeViolationValues={[true]}
 						/>
 						<TabContent
 							value="passed"
-							violations={initialData.violations}
+							violations={testFixture.snapshot.violations}
 							form={form}
-							includePassValues={[true]}
+							includeViolationValues={[false]}
 						/>
 					</Tabs>
 				</form>
 			</Form>
 		</>
 	);
+}
+
+function TestFixtureDetailContainer() {
+	const [testFixture, setTestFixture] = useState<TestFixture>();
+	const { test } = Route.useParams();
+	useEffect(() => {
+		fetch(`http://localhost:8082/tests/${test}`, {
+			method: "POST",
+			mode: "cors",
+		})
+			.then((res) => {
+				return res.json();
+			})
+			.then((data) => {
+				const {
+					success,
+					data: parsed,
+					error,
+				} = TestFixtureSchema.safeParse(data);
+				if (!success) {
+					console.error(error);
+					return;
+				}
+				setTestFixture(parsed);
+			});
+	}, [test]);
+	if (!testFixture) return null;
+	return <TestFixtureDetail testFixture={testFixture} />;
 }

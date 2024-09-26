@@ -1,4 +1,3 @@
-import { Badge } from "@/components/ui/badge";
 import {
 	Breadcrumb,
 	BreadcrumbItem,
@@ -6,7 +5,6 @@ import {
 	BreadcrumbPage,
 } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
 	Table,
 	TableBody,
@@ -17,9 +15,9 @@ import {
 } from "@/components/ui/table";
 import { Tabs } from "@/components/ui/tabs";
 import { TypographyH2 } from "@/components/ui/typography";
+import { ListTextFixtureResponseSchema, type TestFixture } from "@/lib/utils";
 import { Link, createLazyFileRoute } from "@tanstack/react-router";
-import { Search } from "lucide-react";
-import { z } from "zod";
+import { useEffect, useState } from "react";
 
 export const description =
 	"An products dashboard with a sidebar navigation. The sidebar has icon navigation. The content area has a breadcrumb and search in the header. It displays a list of products in a table with actions.";
@@ -28,75 +26,49 @@ export const Route = createLazyFileRoute("/")({
 	component: Index,
 });
 
-const tests: Test[] = [
-	{
-		violations: {
-			"text-too-wide": false,
-			"bad-gray-text": false,
-		},
-		name: "Test 1",
-		file: "test.tsx",
-		status: "passed",
-		contentHash:
-			"44275f8ca9597f6bd896c5319e95d85a2e21ddc5b68ed3e994e23ef54388260d",
-	},
-];
-
-const TestSchema = z.object({
-	contentHash: z.string(),
-	name: z.string(),
-	file: z.string(),
-	status: z.enum(["passed", "failed"]),
-	violations: z.record(z.string(), z.boolean()),
-});
-type Test = z.infer<typeof TestSchema>;
-
 function TestsTable({
-	tests,
+	testFixtures,
 }: {
-	tests: Test[];
+	testFixtures: TestFixture[];
 }) {
+	console.log(testFixtures, "TEST FIXTURES");
 	return (
 		<>
 			<div className="flex justify-between border-b">
 				<TypographyH2>Tests</TypographyH2>
-				<div className="relative ml-auto flex-1 md:grow-0">
-					<Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-					<Input
-						type="search"
-						placeholder="Search..."
-						className="w-full rounded-lg bg-background pl-8 md:w-[200px] lg:w-[320px]"
-					/>
-				</div>
 			</div>
 			<Table>
 				<TableHeader>
-					<TableRow>
-						<TableHead>Name</TableHead>
-						<TableHead>File</TableHead>
-						<TableHead>Status</TableHead>
-						<TableHead className="hidden md:table-cell">Updated at</TableHead>
+					<TableRow className="text-sm text-muted-foreground font-medium">
+						<TableHead className="text-sm text-muted-foreground font-medium">
+							Name
+						</TableHead>
+						<TableHead className="text-sm text-muted-foreground font-medium">
+							File
+						</TableHead>
+						<TableHead className="text-sm text-muted-foreground font-medium hidden md:table-cell">
+							Updated at
+						</TableHead>
 						<TableHead>
 							<span className="sr-only">Actions</span>
 						</TableHead>
 					</TableRow>
 				</TableHeader>
 				<TableBody>
-					{tests.map((test) => (
-						<TableRow key={test.contentHash}>
-							<TableCell className="table-cell">{test.name}</TableCell>
-							<TableCell>{test.file}</TableCell>
-							<TableCell>
-								<Badge variant="outline">
-									{test.status === "passed" ? "Passed" : "Failed"}
-								</Badge>
+					{testFixtures.map((testFixture) => (
+						<TableRow key={testFixture.snapshot.contentHash}>
+							<TableCell className="table-cell">
+								<span className="font-semibold">
+									{testFixture.snapshot.name}
+								</span>
 							</TableCell>
+							<TableCell className="w-72">{testFixture.file}</TableCell>
 							<TableCell className="hidden md:table-cell">
-								2023-07-12 10:42 AM
+								{new Date(testFixture.lastModified).toLocaleDateString()}
 							</TableCell>
 							<TableCell>
-								<Link to={`tests/${test.file}`}>
-									<Button>View Details</Button>
+								<Link to={`tests/${testFixture.file}`}>
+									<Button>Details</Button>
 								</Link>
 							</TableCell>
 						</TableRow>
@@ -108,6 +80,27 @@ function TestsTable({
 }
 
 export function Index() {
+	const [testFixtures, setTestFixtures] = useState<TestFixture[]>();
+	useEffect(() => {
+		fetch("http://localhost:8082/tests", { method: "POST", mode: "cors" })
+			.then((res) => {
+				console.log(res.body, "BODY", res.status, "STATUS", res.statusText);
+				return res.json();
+			})
+			.then((data) => {
+				const {
+					success,
+					data: parsed,
+					error,
+				} = ListTextFixtureResponseSchema.safeParse(data);
+				if (!success) {
+					console.error(error);
+					return;
+				}
+				setTestFixtures(parsed.fixtures);
+			});
+	}, []);
+	if (!testFixtures) return null;
 	return (
 		<>
 			<Breadcrumb className="hidden md:flex">
@@ -119,7 +112,7 @@ export function Index() {
 			</Breadcrumb>
 			<main className="grid flex-1 items-start gap-4 sm:py-0 md:gap-8">
 				<Tabs defaultValue="all">
-					<TestsTable tests={tests} />
+					<TestsTable testFixtures={testFixtures} />
 				</Tabs>
 			</main>
 		</>
