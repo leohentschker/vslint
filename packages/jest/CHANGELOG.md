@@ -1,5 +1,13 @@
 # @vslint/jest
 
+## 0.2.6
+
+### Patch Changes
+
+- d9a9a19: Swapping fixture file format to markdown from JSON
+- Updated dependencies [d9a9a19]
+  - @vslint/shared@0.0.6
+
 ## 0.2.5
 
 ### Patch Changes
