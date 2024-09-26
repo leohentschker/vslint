@@ -1,4 +1,5 @@
-import { ReviewRequestSchema } from "@vslint/shared";
+import crypto from "node:crypto";
+import { ReviewRequestSchema, type ReviewResponse } from "@vslint/shared";
 import bodyParser from "body-parser";
 import cors from "cors";
 import express from "express";
@@ -47,10 +48,19 @@ app.post("/api/v1/design-review", async (req, res) => {
 			message: reviewError.message,
 		});
 	}
-	res.json({
+	const content = Buffer.from(renderResponse).toString("base64");
+	const pass = Object.values(reviewResponse.violations).every(
+		(violation) => !violation.fail,
+	);
+	const response: ReviewResponse = {
 		...reviewResponse,
-		rendering: Buffer.from(renderResponse).toString("base64"),
-	});
+		content,
+		viewport: reviewRequest.options.viewport,
+		name: reviewRequest.testDetails.name,
+		contentHash: crypto.createHash("md5").update(reviewRequest.content).digest("hex"),
+		pass
+	};
+	res.json(response);
 });
 
 app.listen(port, () => {

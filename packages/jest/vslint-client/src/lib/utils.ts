@@ -1,3 +1,4 @@
+import { ReviewResponseSchema } from "@vslint/shared";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { z } from "zod";
@@ -5,26 +6,8 @@ import { z } from "zod";
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
 }
-
-export const TestSnapshotSchema = z.object({
-	explanation: z.string().optional(),
-	contentHash: z.string(),
-	violations: z.record(
-		z.string(),
-		z.object({
-			fail: z.boolean(),
-			rule: z.string(),
-		}),
-	),
-	name: z.string(),
-	content: z.string(),
-	viewport: z.object({
-		width: z.number(),
-		height: z.number(),
-	}),
-});
 export const TestFixtureSchema = z.object({
-	snapshot: TestSnapshotSchema,
+	snapshot: ReviewResponseSchema,
 	file: z.string(),
 	lastModified: z.string(),
 });

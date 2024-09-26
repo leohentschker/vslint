@@ -93,7 +93,6 @@ test('render text that is too long and hard to read', async () => {
 | ------------------------ | -------- | ------------------------ | -------------------------------------------------------------------------------------------------------------------------- |
 | `atSize`                  | `string` | `{ width: number; height: number;}`   | `{ width: 1920, height: 1080 }`                    | The viewport size to render the content at. Can be `full-screen`, `mobile`, `tablet`, `sm`, `md`, `lg`, `xl`, `2xl`, `3xl`
 | `log`                     | `string` or `winston.Logger`  | `info`                    | Allows you to set a log level or pass in a custom Winston logger.
-| `storeRendering` | `boolean` | `false` | If `true` will also store the image rendered on the server. This parameter is useful for debugging.
 
 ## Deploying a review server
 Deploy the dockerfile at `packages/server/Dockerfile` to run a design review server

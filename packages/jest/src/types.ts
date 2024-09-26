@@ -12,7 +12,6 @@ export const DesignReviewMatcherSchema = z.object({
 export type DesignReviewMatcher = z.infer<typeof DesignReviewMatcherSchema>;
 
 export const DesignReviewRunSchema = z.object({
-	storeRendering: z.boolean().optional(),
 	atSize: RenderSizeSchema.optional(),
 	log: z
 		.union([

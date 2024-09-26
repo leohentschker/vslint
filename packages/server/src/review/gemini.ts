@@ -2,7 +2,12 @@ import * as fs from "node:fs";
 import path from "node:path";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { GoogleAIFileManager } from "@google/generative-ai/server";
-import { Failure, Ok, type ReviewRequest } from "@vslint/shared";
+import {
+	Failure,
+	Ok,
+	type ReviewRequest,
+	type ReviewResponse,
+} from "@vslint/shared";
 import { logger } from "../logger";
 
 const TMPFILE_DIR = "./review_images/";
@@ -111,7 +116,20 @@ export const runGeminiReview = async (
 			"Return design review results in JSON format.",
 		);
 		const reviewResult = result.response.text();
-		return Ok(JSON.parse(reviewResult));
+		const parsedResult = JSON.parse(reviewResult);
+		const violations: ReviewResponse["violations"] = {};
+		let explanation = "No design violations detected in component.";
+		for (const rule of renderRequest.rules) {
+			const ruleResult = parsedResult[rule.ruleid];
+			violations[rule.ruleid] = {
+				fail: ruleResult,
+				rule: rule.description,
+			};
+			if (ruleResult) {
+				explanation = `Design violations detected in component: ${rule.description}`;
+			}
+		}
+		return Ok({ violations, explanation });
 	} catch (err) {
 		return Failure(err);
 	}
