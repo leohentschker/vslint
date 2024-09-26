@@ -23,10 +23,7 @@ jobs:
           node-version: "20"
 
       - name: Install dependencies
-        run: npm install
-      
-      - name: Build client
-        run: cd packages/jest/vslint-client && npm install && npm run build
+        run: npm install && cd packages/jest/vslint-client && npm install
 
       - name: Build shared types
         run: cd packages/shared && npm run build
