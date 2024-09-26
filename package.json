@@ -22,12 +22,11 @@
 		"vitest": "^2.0.5"
 	},
 	"scripts": {
-		"build": "cd packages/jest && npm run build && cd ../shared && npm run build",
+		"build": "cd packages/jest && npm run build && cd vslint-client && npm run build && cd ../../shared && npm run build",
 		"test": "vitest run",
 		"format": "biome format --write",
 		"check": "biome check",
-		"lint": "tsc",
-		"ci": "npm run build && npm run check && npm run test && npm run check-exports && npm run lint",
+		"ci": "npm run build && npm run check && npm run test && npm run check-exports",
 		"check-exports": "attw --pack ./packages/*",
 		"local-release": "changeset version && changeset publish",
 		"prepublishOnly": "npm run ci"

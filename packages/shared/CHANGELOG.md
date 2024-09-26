@@ -1,5 +1,11 @@
 # @vslint/shared
 
+## 0.0.5
+
+### Patch Changes
+
+- 85bb566: Updates available models to include gemini-1.5
+
 ## 0.0.4
 
 ### Patch Changes

@@ -1,5 +1,13 @@
 # @vslint/jest
 
+## 0.2.5
+
+### Patch Changes
+
+- 85bb566: Updates available models to include gemini-1.5
+- Updated dependencies [85bb566]
+  - @vslint/shared@0.0.5
+
 ## 0.2.4
 
 ### Patch Changes

@@ -1,11 +1,12 @@
 {
 	"name": "@vslint/jest",
-	"version": "0.2.4",
+	"version": "0.2.5",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
 	"author": "Leo Hentschker <lhentschker@gmail.com>",
 	"scripts": {
-		"build": "tsup"
+		"build": "tsup",
+		"watch": "tsup --watch"
 	},
 	"peerDependencies": {
 		"jest": ">=27.0.0"
@@ -23,7 +24,7 @@
 		}
 	},
 	"dependencies": {
-		"@vslint/shared": "^0.0.4",
+		"@vslint/shared": "^0.0.5",
 		"axios": "^1.7.7"
 	}
 }
