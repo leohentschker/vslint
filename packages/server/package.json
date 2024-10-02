@@ -1,6 +1,6 @@
 {
 	"name": "@vslint/server",
-	"version": "0.2.2",
+	"version": "0.2.3",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
 	"author": "Leo Hentschker <lhentschker@gmail.com>",
@@ -14,6 +14,9 @@
 			"import": "./dist/index.mjs",
 			"default": "./dist/index.js"
 		}
+	},
+	"bin": {
+		"@vslint/server": "./dist/app.js"
 	},
 	"dependencies": {
 		"@google/generative-ai": "^0.19.0",

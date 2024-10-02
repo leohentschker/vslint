@@ -1,5 +1,11 @@
 # @vslint/server
 
+## 0.2.3
+
+### Patch Changes
+
+- c0f36d0: Small updates across the board
+
 ## 0.2.2
 
 ### Patch Changes

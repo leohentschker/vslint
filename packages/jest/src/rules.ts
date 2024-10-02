@@ -1,29 +1,53 @@
 import type { Rule } from "@vslint/shared";
-
 export const DEFAULT_RULES: Rule[] = [
 	{
 		ruleid: "text-too-wide",
 		description:
-			"If any line of text contains more than 75 characters, mark it as true; otherwise, mark it as false.",
+			"First write out how many characters are on each line of text. If a single line of text, as it appears between line breaks (aka newlines), contains more than 75 characters, excluding spaces and punctuation, mark it as true and explain which line is too long; otherwise, mark it as false.",
 	},
 	{
-		ruleid: "text-has-typos",
+		ruleid: "bad-gray-text",
 		description:
-			"If there are any spelling or grammatical errors, or content is in the wrong tense, mark it as true; otherwise, mark it as false. Be very harsh.",
+			"Gray text components should have the same color. This does not apply to placeholders or labels. If text components have different shades of gray, mark it as true; otherwise, mark it as false.",
 	},
 	{
-		ruleid: "text-is-coherent",
+		ruleid: "missing-placeholders",
 		description:
-			"If text for grouped elements isn't following the same grammatical style or structure, mark it as true; otherwise, mark it as false",
+			"Form components with text inputs should have placeholders on all items in their empty state. If there are no placeholders, mark it as true; otherwise, mark it as false",
 	},
 	{
-		ruleid: "text-too-small",
+		ruleid: "duplicative-copy",
 		description:
-			"Check if the text is easily readable. If the text size is too small, mark it as true; otherwise, mark it as false.",
+			"Titles and subtitle should have meaningfully differentiated copy; subtitles shouldn't just restate the title with more words. If the subtitle restates the title with more words, mark it as true; otherwise mark it as false.",
 	},
 	{
-		ruleid: "hierarchy-through-font-weight",
+		ruleid: "no-half-width-forms",
 		description:
-			"Check to see if hierarchy is managed via font weight not via font size. ",
+			"Look at the last row of forms and count the number of components. If there is only one component on the last row, it should take up the full width. However, if there are two or more components on the last row, they can be half-width or appropriately distributed. If there is just one component on the last row and it doesn't take up the full width, mark it as true; otherwise, mark it as false.",
+	},
+	{
+		ruleid: "minimal-forms",
+		description:
+			"Forms should not use too many full width components and should instead collapse them into one row of two half-width components. If there are back to back full width components in your form, mark it as true; otherwise mark it as false.",
+	},
+	{
+		ruleid: "no-bad-copy",
+		description:
+			"Copy should look professional, not be repetitive, and be at a high quality. It should have no typos or glaring errors. If the product copy is not good, mark it as true; otherwise mark it as false.",
+	},
+	{
+		ruleid: "no-default-checkboxes",
+		description:
+			"Default checkboxes look bad. If you're using the default input html checkbox, use a radio group or a card instead. If there is a default checkbox, mark it as true; otherwise mark it as false.",
+	},
+	{
+		ruleid: "no-unclear-labels",
+		description:
+			"Labels should use general language that is easy to understand and isn't specific to the product. If the label says things that are product-specific and wouldn't be clear to a general user, mark it as true; otherwise, mark it as false.",
+	},
+	{
+		ruleid: "no-unconstrained-width",
+		description:
+			"Content should generally not be the full screen width at very large screen sizes and should instead be constrained on a max width. This only applies for full page layouts. If content in a full page layout stretches very wide on large screens, mark it as true; otherwise mark it as false.",
 	},
 ];
