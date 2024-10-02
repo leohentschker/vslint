@@ -7,9 +7,9 @@
 **TLDR**: Custom matcher for React testing frameworks that uses multi-modal AI models to enforce UI/UX patterns.
 * Supports the Jest testing framework
 * Uses chromium to render html snapshots
-* Supports Gemini and OpenAI models for analysis
+* Supports OpenAI and Gemini (in beta) models for analysis
 * Creates snapshot files in Markdown format to store the results of automated testing
-* Supports running your own design review server locally with `npx @vslint/server`, on your backend or in the cloud with a Dockerfile
+* Supports running your own design review server locally with `npx @vslint/server`, in your backend by installing an `npm` module or in the cloud with a Dockerfile
 
 ```typescript
 import { render } from '@testing-library/react';
