@@ -1,5 +1,12 @@
 # @vslint/jest
 
+## 0.2.8
+
+### Patch Changes
+
+- aa49473: Fixing parsing "pass" property
+- c0f36d0: Small updates across the board
+
 ## 0.2.7
 
 ### Patch Changes
