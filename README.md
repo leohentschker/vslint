@@ -95,6 +95,8 @@ npx @vslint/server
 ```
 Run the server on a custom port by settingg the `PORT` environment variable.
 
+You can target this server by setting the `reviewEndpoint` parameter in the `extendExpectDesignReviewer` call to `DEFAULT_LOCAL_REVIEW_ENDPOINT`.
+
 ### Deploying to Google Cloud
 Deploy the dockerfile at `packages/server/Dockerfile` to run a design review server. You can deploy on Google Cloud by clicking the button below.
 
