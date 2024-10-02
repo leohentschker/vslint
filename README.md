@@ -9,29 +9,24 @@
 * Uses chromium to render html snapshots
 * Supports Gemini and OpenAI models for analysis
 * Creates snapshot files in Markdown format to store the results of automated testing
+* Supports running the design review server locally with `npx @vslint/server`
 
 ```typescript
 import { render } from '@testing-library/react';
 import { extendExpectDesignReviewer, DEFAULT_REVIEW_TIMEOUT } from '@vslint/jest';
-import Button from '../src/Button'; // Adjust the import path as needed
+import Button from '../src/Button';
 
-// extend jest's expect
 expect.extend(extendExpectDesignReviewer({
-  // global CSS paths that enable correct rendering
   customStyles: ['./styles/globals.css'],
-  // set custom UX rules, default rules are in @vslint/jest/rules
   rules: [{
     ruleid: "text-too-wide", description: "If any line of text contains more than 75 characters, mark it as true; otherwise, mark it as false.",
   }],
-  // pass the calls through OpenAI's multi-modal models
   model: { modelName: 'gpt-4o-mini', key: process.env.OPENAI_API_KEY }
 }));
 
 test('text content that is too wide on desktop screens and is not legible', async () => {
   const { container } = render(<div>Incredibly long content potentially too long. Human readability is best at a maximum of 75 characters</div>);
-  // note that the matcher must always be async
   await expect(container).toPassDesignReview();
-// setting a timeout here is important, as the model can take a while to respond
 }, DEFAULT_REVIEW_TIMEOUT);
 ```
 
@@ -83,11 +78,9 @@ test('render text that is too long and hard to read', async () => {
     // optional, sets the viewport size to render the content at
     atSize: 'md',
     // optional, sets the log level (or a custom winston logger)
-    log: 'debug',
-    // optional, if true will store the rendered image next to the snapshot file
-    storeRendering: false
+    log: 'debug'
   });
-});
+}, DEFAULT_REVIEW_TIMEOUT);
 ```
 
 | Parameter                | type     | default                  | Description
@@ -95,10 +88,17 @@ test('render text that is too long and hard to read', async () => {
 | `atSize`                  | `string` | `{ width: number; height: number;}`   | `{ width: 1920, height: 1080 }`                    | The viewport size to render the content at. Can be `full-screen`, `mobile`, `tablet`, `sm`, `md`, `lg`, `xl`, `2xl`, `3xl`
 | `log`                     | `string` or `winston.Logger`  | `info`                    | Allows you to set a log level or pass in a custom Winston logger.
 
-## Deploying a review server
-Deploy the dockerfile at `packages/server/Dockerfile` to run a design review server
+## Accessing a review server
+### Run using `npx`
+```
+npx @vslint/server
+```
+Run the server on a custom port by settingg the `PORT` environment variable.
+
 ### Deploying to Google Cloud
-Deploy on Google Cloud:
+Deploy the dockerfile at `packages/server/Dockerfile` to run a design review server. You can deploy on Google Cloud by clicking the button below.
+
+
 [![Run on Google Cloud](https://deploy.cloud.run/button.svg)](https://deploy.cloud.run?git_repo=https://github.com/leohentschker/vslint&revision=main&dir=packages/server)
 
 ### Running in your existing backend

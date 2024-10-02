@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import crypto from "node:crypto";
 import { ReviewRequestSchema, type ReviewResponse } from "@vslint/shared";
 import bodyParser from "body-parser";
