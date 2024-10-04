@@ -1,37 +1,37 @@
 {
-	"name": "@vslint/server",
-	"version": "0.2.3",
-	"main": "dist/index.js",
-	"types": "dist/index.d.ts",
-	"author": "Leo Hentschker <lhentschker@gmail.com>",
-	"scripts": {
-		"build": "tsup",
-		"watch": "tsup --watch"
-	},
-	"exports": {
-		"./package.json": "./package.json",
-		".": {
-			"import": "./dist/index.mjs",
-			"default": "./dist/index.js"
-		}
-	},
-	"bin": {
-		"@vslint/server": "./dist/app.js"
-	},
-	"dependencies": {
-		"@google/generative-ai": "^0.19.0",
-		"@vslint/shared": "^0.0.7",
-		"body-parser": "^1.20.3",
-		"cors": "^2.8.5",
-		"express": "^4.21.0",
-		"jsdom": "^25.0.0",
-		"openai": "^4.61.0",
-		"puppeteer": "^23.3.0",
-		"zod": "^3.23.8"
-	},
-	"devDependencies": {
-		"@types/cors": "^2.8.17",
-		"@types/express": "^4.17.21",
-		"@types/jsdom": "^21.1.7"
-	}
+  "name": "@vslint/server",
+  "version": "0.2.3",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "author": "Leo Hentschker <lhentschker@gmail.com>",
+  "scripts": {
+    "build": "tsup",
+    "watch": "tsup --watch"
+  },
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "import": "./dist/index.mjs",
+      "default": "./dist/index.js"
+    }
+  },
+  "bin": {
+    "@vslint/server": "./dist/app.js"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.19.0",
+    "@vslint/shared": "^0.0.7",
+    "body-parser": "^1.20.3",
+    "cors": "^2.8.5",
+    "express": "^4.21.0",
+    "jsdom": "^25.0.0",
+    "openai": "^4.61.0",
+    "puppeteer": "^23.3.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/jsdom": "^21.1.7"
+  }
 }
