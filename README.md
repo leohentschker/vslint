@@ -9,7 +9,7 @@
 * Uses chromium to render html snapshots
 * Supports OpenAI and Gemini (in beta) models for analysis
 * Creates snapshot files in Markdown format to store the results of automated testing
-* Supports running your own design review server locally with `npx @vslint/server`, in your backend by installing an `npm` module or in the cloud with a Dockerfile
+* Supports running a review server with `npx @vslint/server`, or in the cloud with a Dockerfile
 
 ```typescript
 import { render } from '@testing-library/react';
