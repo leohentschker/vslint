@@ -1,6 +1,13 @@
 import * as fs from "node:fs";
 import path from "node:path";
-import type { ReviewRequest, ReviewResponse } from "@vslint/shared";
+import {
+  DEFAULT_RULES,
+  type ReviewRequest,
+  type ReviewResponse,
+  getViewportSize,
+  markdownToReviewResponse,
+  reviewResponseToMarkdown,
+} from "@vslint/shared";
 import axios, { type AxiosError, type AxiosResponse } from "axios";
 import {
   DEFAULT_DESIGN_SNAPSHOT_DIR,
@@ -9,9 +16,7 @@ import {
 import { getContentHash } from "./helpers";
 import { getSnapshotIdentifier } from "./jest";
 import { getLogger } from "./logging";
-import { markdownToReviewResponse, reviewResponseToMarkdown } from "./markdown";
-import { elementIsHTMLElement, getViewportSize } from "./render";
-import { DEFAULT_RULES } from "./rules";
+import { elementIsHTMLElement } from "./render";
 import {
   type DesignReviewMatcher,
   DesignReviewMatcherSchema,

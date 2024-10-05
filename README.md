@@ -13,14 +13,12 @@
 
 ```typescript
 import { render } from '@testing-library/react';
-import { extendExpectDesignReviewer, DEFAULT_REVIEW_TIMEOUT } from '@vslint/jest';
+import { extendExpectDesignReviewer, DEFAULT_REVIEW_TIMEOUT, DEFAULT_RULES } from '@vslint/jest';
 import Button from '../src/Button';
 
 expect.extend(extendExpectDesignReviewer({
   customStyles: ['./styles/globals.css'],
-  rules: [{
-    ruleid: "text-too-wide", description: "If any line of text contains more than 75 characters, mark it as true; otherwise, mark it as false.",
-  }],
+  rules: DEFAULT_RULES,
   model: { modelName: 'gpt-4o-mini', key: process.env.OPENAI_API_KEY }
 }));
 
@@ -28,6 +26,10 @@ test('text content that is too wide on desktop screens and is not legible', asyn
   const { container } = render(<div>Incredibly long content potentially too long. Human readability is best at a maximum of 75 characters</div>);
   await expect(container).toPassDesignReview();
 }, DEFAULT_REVIEW_TIMEOUT);
+```
+To run your own local review server:
+```shell
+npx @vslint/server
 ```
 
 ## Usage
@@ -93,9 +95,7 @@ test('render text that is too long and hard to read', async () => {
 ```
 npx @vslint/server
 ```
-Run the server on a custom port by settingg the `PORT` environment variable.
-
-You can target this server by setting the `reviewEndpoint` parameter in the `extendExpectDesignReviewer` call to `DEFAULT_LOCAL_REVIEW_ENDPOINT`.
+Run the server on a custom port by settingg the `PORT` environment variable. You can target this server by setting the `reviewEndpoint` parameter in the `extendExpectDesignReviewer` call to `DEFAULT_LOCAL_REVIEW_ENDPOINT`.
 
 ### Deploying to Google Cloud
 Deploy the dockerfile at `packages/server/Dockerfile` to run a design review server. You can deploy on Google Cloud by clicking the button below.

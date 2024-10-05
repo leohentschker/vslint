@@ -6,7 +6,7 @@ import {
 } from "@vslint/shared";
 import OpenAI from "openai";
 import { z } from "zod";
-import { logger } from "../logger";
+import { getLogger } from "../logger";
 
 const OpenaiResponseSchema = z.object({
   explanation: z.string().optional(),
@@ -31,7 +31,7 @@ YOU ARE A SENIOR DESIGNER THAT CARES A LOT ABOUT DESIGN QUALITY AND DOES NOT MIS
 `.trim();
 
 const getChatCompletion = async (
-  reviewRequest: ReviewRequest,
+  reviewRequest: Pick<ReviewRequest, "model" | "rules">,
   rule: ReviewRequest["rules"][number],
   openai: OpenAI,
   base64image: string,
@@ -40,7 +40,7 @@ const getChatCompletion = async (
   let completion: OpenAI.Chat.ChatCompletion;
   try {
     const userPrompt = `${BASE_OPENAI_SYSTEM_PROMPT}\n\nReturn in JSON format: { explanation: string; fail: boolean; }.\n\nHere is the rule you are evaluating:\n## ${rule.ruleid}\n${rule.description}`;
-    logger.debug("Creating OpenAI chat completion");
+    getLogger().debug("Creating OpenAI chat completion");
     completion = await openai.chat.completions.create({
       model: reviewRequest.model.modelName,
       response_format: {
@@ -68,14 +68,14 @@ const getChatCompletion = async (
       ],
     });
   } catch (error) {
-    logger.error(error);
+    getLogger().error(error);
     return Failure(error);
   }
   const result = completion.choices[0]?.message.content;
   if (!result) return Failure(new Error("No result from OpenAI"));
   const parsedResult = OpenaiResponseSchema.safeParse(JSON.parse(result));
   if (!parsedResult.success) {
-    logger.error(parsedResult.error);
+    getLogger().error(parsedResult.error);
     return Failure(new Error("Failed to parse OpenAI response"));
   }
   return Ok({
@@ -85,7 +85,7 @@ const getChatCompletion = async (
 };
 
 export const runOpenaiReview = async (
-  renderRequest: ReviewRequest,
+  renderRequest: Pick<ReviewRequest, "model" | "rules">,
   imageBuffer: Buffer,
   mimeType: "image/png",
 ) => {
@@ -130,7 +130,7 @@ export const runOpenaiReview = async (
     ? failedExplanations.join("\n\n")
     : "Design review passed.";
 
-  logger.debug(`OpenAI response: ${JSON.stringify(violations)}`);
-  logger.debug(`OpenAI explanation: ${explanation}`);
+  getLogger().debug(`OpenAI response: ${JSON.stringify(violations)}`);
+  getLogger().debug(`OpenAI explanation: ${explanation}`);
   return Ok({ violations, explanation });
 };

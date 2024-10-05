@@ -1,6 +1,7 @@
 import { Failure, Ok, type Option, type ReviewRequest } from "@vslint/shared";
 import { JSDOM } from "jsdom";
 import puppeteer, { type Browser } from "puppeteer";
+import { getLogger } from "./logger";
 
 let _BROWSER: null | Browser = null;
 const getBrowser = async () => {
@@ -13,23 +14,46 @@ const getBrowser = async () => {
   }
   return _BROWSER;
 };
-export const renderDom = async ({
-  stylesheets,
+
+export const getHtmlFromURL = async (url: string) => {
+  try {
+    const browser = await getBrowser();
+    const page = await browser.newPage();
+    await page.goto(url);
+    await page.waitForNetworkIdle({ idleTime: 500 });
+    const content = await page.content();
+    await page.close();
+    return Ok(content);
+  } catch (err) {
+    getLogger().error(`Failed to fetch URL: ${err}`);
+    return Failure(err);
+  }
+};
+
+export const getHtmlFromReviewRequest = ({
   content,
-  options,
-}: ReviewRequest): Promise<Option<Buffer>> => {
+  stylesheets,
+}: ReviewRequest) => {
   const dom = new JSDOM(content);
   const style = dom.window.document.createElement("style");
   style.innerHTML = stylesheets.join("\n");
   dom.window.document.head.appendChild(style);
+  return dom.serialize();
+};
+
+export const renderHtmlContent = async (
+  html: string,
+  options: ReviewRequest["options"],
+): Promise<Option<Buffer>> => {
   try {
     const browser = await getBrowser();
     const page = await browser.newPage();
-    await page.setContent(dom.serialize());
+    await page.setContent(html);
     await page.setViewport({
       ...options.viewport,
       deviceScaleFactor: 2,
     });
+    await page.waitForNetworkIdle();
     const pageScreenshot = await page.screenshot({ type: "png" });
     await page.close();
     return Ok(Buffer.from(pageScreenshot));
@@ -37,4 +61,9 @@ export const renderDom = async ({
     console.log(err, "Failed to render DOM");
     return Failure(err);
   }
+};
+
+export const getHtmlAndRender = async (reviewRequest: ReviewRequest) => {
+  const html = await getHtmlFromReviewRequest(reviewRequest);
+  return renderHtmlContent(html, reviewRequest.options);
 };
