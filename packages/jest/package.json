@@ -28,7 +28,7 @@
     }
   },
   "dependencies": {
-    "@vslint/shared": "file:../shared",
+    "@vslint/shared": "^0.0.8",
     "axios": "^1.7.7"
   }
 }
