@@ -4,8 +4,8 @@ import { ReviewRequestSchema, type ReviewResponse } from "@vslint/shared";
 import bodyParser from "body-parser";
 import cors from "cors";
 import express from "express";
-import { renderDom } from ".";
-import { logger } from "./logger";
+import { getLogger, setLogLevel } from "./logger";
+import { getHtmlAndRender } from "./render";
 import { runReview } from "./review";
 
 const port = process.env.PORT || 8080;
@@ -14,23 +14,24 @@ app.use(bodyParser.json({ limit: "50mb" }));
 app.use(cors());
 
 app.post("/api/v1/design-review", async (req, res) => {
-  logger.info("Initiating request...");
+  setLogLevel("debug");
+  getLogger().info("Initiating request...");
   const {
     success: parseSuccess,
     data: reviewRequest,
     error: parseError,
   } = ReviewRequestSchema.safeParse(req.body);
   if (!parseSuccess) {
-    logger.error(`Failed to parse request: ${parseError.message}`);
+    getLogger().error(`Failed to parse request: ${parseError.message}`);
     return res.status(400).json({
       error: "Invalid request",
       message: parseError.message,
     });
   }
   const { response: renderResponse, error: renderError } =
-    await renderDom(reviewRequest);
+    await getHtmlAndRender(reviewRequest);
   if (renderError) {
-    logger.error(`Failed to render container ${renderError}`);
+    getLogger().error(`Failed to render container ${renderError}`);
     return res.status(500).json({
       error: "Failed to render",
       message: renderError.message,
@@ -43,7 +44,7 @@ app.post("/api/v1/design-review", async (req, res) => {
     "image/png",
   );
   if (reviewError) {
-    logger.error(`Failed to run automated design review: ${reviewError}`);
+    getLogger().error(`Failed to run automated design review: ${reviewError}`);
     return res.status(500).json({
       error: "Failed to review",
       message: reviewError.message,
@@ -68,5 +69,5 @@ app.post("/api/v1/design-review", async (req, res) => {
 });
 
 app.listen(port, () => {
-  logger.info(`Listening on port ${port}`);
+  getLogger().info(`Listening on port ${port}`);
 });

@@ -5,7 +5,7 @@ import { runOpenaiReview } from "./openai";
 const GEMINI_MODELS = ["gemini-1.5-flash"];
 
 export const runReview = async (
-  renderRequest: ReviewRequest,
+  renderRequest: Pick<ReviewRequest, "model" | "rules">,
   imageBuffer: Buffer,
   mimeType: "image/png",
 ) => {

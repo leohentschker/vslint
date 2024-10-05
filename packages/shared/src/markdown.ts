@@ -1,5 +1,5 @@
 import path from "node:path";
-import type { ReviewResponse } from "@vslint/shared";
+import type { ReviewResponse } from "./requests";
 
 export const reviewResponseToMarkdown = (
   response: ReviewResponse,

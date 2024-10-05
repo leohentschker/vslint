@@ -1,2 +1,2 @@
-import { renderDom } from "./render";
-export { renderDom };
+import { getHtmlAndRender } from "./render";
+export { getHtmlAndRender };
