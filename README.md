@@ -27,9 +27,9 @@ test('text content that is too wide on desktop screens and is not legible', asyn
   await expect(container).toPassDesignReview();
 }, DEFAULT_REVIEW_TIMEOUT);
 ```
-
+To run your own local review server:
 ```shell
-npx @vslint/server evaluate https://www.kayak.com/
+npx @vslint/server
 ```
 
 ## Usage
