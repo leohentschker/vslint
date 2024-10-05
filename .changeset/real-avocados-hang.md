@@ -1,0 +1,5 @@
+---
+"@vslint/shared": patch
+---
+
+Updates
