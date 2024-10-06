@@ -21,9 +21,9 @@ export const DEFAULT_RULES: Rule[] = [
       "First write out how many characters are on each line of text. If a single line of text, as it appears between line breaks (aka newlines), contains more than 75 characters, excluding spaces and punctuation, mark it as true and explain which line is too long; otherwise, mark it as false.",
   },
   {
-    ruleid: "bad-gray-text",
+    ruleid: "bad-gray-colors",
     description:
-      "Gray text components should have the same color. This does not apply to placeholders or labels. If text components have different shades of gray, mark it as true; otherwise, mark it as false.",
+      "First note the font weights of each line of text. This rule does not apply to fonts with different weights. Gray text with the same font weight should have the same color. If text components have different shades of gray for the same font weight, mark it as true; otherwise, mark it as false.",
   },
   {
     ruleid: "missing-placeholders",
@@ -38,12 +38,12 @@ export const DEFAULT_RULES: Rule[] = [
   {
     ruleid: "no-half-width-forms",
     description:
-      "Look at the last row of forms and count the number of components. If there is only one component on the last row, it should take up the full width. However, if there are two or more components on the last row, they can be half-width or appropriately distributed. If there is just one component on the last row and it doesn't take up the full width, mark it as true; otherwise, mark it as false.",
+      "This rule only applies to forms, return false if the component is not a form. Look at the last row of forms and count the number of components. If there is only one component on the last row, it should take up the full width. However, if there are two or more components on the last row, they can be half-width or appropriately distributed. If there is just one component on the last row and it doesn't take up the full width, mark it as true; otherwise, mark it as false.",
   },
   {
     ruleid: "minimal-forms",
     description:
-      "Forms should not use too many full width components and should instead collapse them into one row of two half-width components. If there are back to back full width components in your form, mark it as true; otherwise mark it as false.",
+      "This rule only applies to forms, return false if the component is not a form. Forms should not use too many full width components and should instead collapse them into one row of two half-width components. If there are back to back full width components in your form, mark it as true; otherwise mark it as false.",
   },
   {
     ruleid: "no-bad-copy",
@@ -58,7 +58,7 @@ export const DEFAULT_RULES: Rule[] = [
   {
     ruleid: "no-unclear-labels",
     description:
-      "Labels should use general language that is easy to understand and isn't specific to the product. If the label says things that are product-specific and wouldn't be clear to a general user, mark it as true; otherwise, mark it as false.",
+      "This rule is only applicable to forms. Form labels should use general language that is easy to understand and isn't specific to the product. If the label says things that are product-specific and wouldn't be clear to a general user, mark it as true; otherwise, mark it as false.",
   },
   {
     ruleid: "no-unconstrained-width",
