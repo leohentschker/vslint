@@ -1,5 +1,12 @@
 # @vslint/jest
 
+## 0.2.9
+
+### Patch Changes
+
+- 6f61335: Bumping shared
+- 737eaf6: Updating default rules and increasing review timeout
+
 ## 0.2.8
 
 ### Patch Changes
