@@ -1,5 +1,11 @@
 # @vslint/server
 
+## 0.2.5
+
+### Patch Changes
+
+- 6f61335: Bumping shared
+
 ## 0.2.4
 
 ### Patch Changes
