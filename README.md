@@ -9,7 +9,7 @@
 * Uses chromium to render html snapshots
 * Supports OpenAI and Gemini (in beta) models for analysis
 * Creates snapshot files in Markdown format to store the results of automated testing
-* Supports running a review server with `npx @vslint/server`, or in the cloud with a Dockerfile
+* Supports running a local review server with `npx @vslint/server` or in the cloud with a Dockerfile
 
 ```typescript
 import { render } from '@testing-library/react';
@@ -26,10 +26,6 @@ test('text content that is too wide on desktop screens and is not legible', asyn
   const { container } = render(<div>Incredibly long content potentially too long. Human readability is best at a maximum of 75 characters</div>);
   await expect(container).toPassDesignReview();
 }, DEFAULT_REVIEW_TIMEOUT);
-```
-To run your own local review server:
-```shell
-npx @vslint/server
 ```
 
 ## Usage
@@ -65,7 +61,7 @@ expect.extend(extendExpectDesignReviewer({
 | `customStyles`                  | `string[]`   |                          | The path to the css file that is used to generate the hash of the css file and the snapshot.
 | `model`                    | `{ modelName: string; key: string }`  |         | API credentials for the design review model. Supported models are `gpt-4o`, `gpt-4o-mini` and `gemini-1.5-flash`
 | `snapshotsDir`             | `string`   |  `__tests__/__design_snapshots__`        | The directory where the snapshots are stored.
-| `reviewEndpoint`          | `string`   | `https://vslint-644118703752.us-central1.run.app/api/v1/design-review` | The endpoint to use for the review server.
+| `reviewEndpoint`          | `string`   | `https://vslint-644118703752.us-central1.run.app/api/v1/design-review` | The endpoint to use for the review server. Defaults to a shared review server.
 | `log`                     | `string` or `winston.Logger`  | `info`                    | Allows you to set a log level or pass in a custom Winston logger.
 
 #### Using the design review matcher
@@ -95,7 +91,7 @@ test('render text that is too long and hard to read', async () => {
 ```
 npx @vslint/server
 ```
-Run the server on a custom port by settingg the `PORT` environment variable. You can target this server by setting the `reviewEndpoint` parameter in the `extendExpectDesignReviewer` call to `DEFAULT_LOCAL_REVIEW_ENDPOINT`.
+Run the server on a custom port by setting the `PORT` environment variable. You can target this server by setting the `reviewEndpoint` parameter in the `extendExpectDesignReviewer` call to `DEFAULT_LOCAL_REVIEW_ENDPOINT`.
 
 ### Deploying to Google Cloud
 Deploy the dockerfile at `packages/server/Dockerfile` to run a design review server. You can deploy on Google Cloud by clicking the button below.
@@ -110,7 +106,7 @@ import { runReview } from '@vslint/server';
 ```
 
 ## Security and Privacy concerns
-VSLint supports using OpenAI and Gemini models to perform the design review. This means that snapshots are sent to the OpenAI or Gemini API and your API key is being sent to a server.
+VSLint supports using OpenAI and Gemini models to perform the design review as well as a shared backend design review server. While the benefit of using the shared backend is that it's free, this does mean that snapshots are sent to the OpenAI or Gemini API and that your API key is being sent to a server.
 
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
