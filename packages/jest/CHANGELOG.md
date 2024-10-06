@@ -1,5 +1,12 @@
 # @vslint/jest
 
+## 0.2.10
+
+### Patch Changes
+
+- b65dc29: Patch on vslint to reflect new default rules
+- a6f0a08: Updating default rules and increasing review timeout
+
 ## 0.2.9
 
 ### Patch Changes
