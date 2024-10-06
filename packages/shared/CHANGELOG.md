@@ -1,5 +1,11 @@
 # @vslint/shared
 
+## 0.0.9
+
+### Patch Changes
+
+- c72b93f: Bumping default rules
+
 ## 0.0.8
 
 ### Patch Changes
