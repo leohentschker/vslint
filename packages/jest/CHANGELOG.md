@@ -1,5 +1,11 @@
 # @vslint/jest
 
+## 0.2.12
+
+### Patch Changes
+
+- 19c60e6: Updates logging behavior to make it clearer whether the file's html change
+
 ## 0.2.11
 
 ### Patch Changes
