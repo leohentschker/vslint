@@ -1,0 +1,38 @@
+name: Publish
+
+on:
+  push:
+    branches:
+      - add-diff-to-ci-log-error
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build shared types
+        run: cd packages/shared && npm run build
+
+      - name: Run CI
+        run: npm run ci
+
+      - name: Run Changesets
+        uses: changesets/action@v2
+        with:
+          publish: npm
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
