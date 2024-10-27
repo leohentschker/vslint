@@ -13,6 +13,7 @@ import {
   DEFAULT_DESIGN_SNAPSHOT_DIR,
   DEFAULT_REVIEW_ENDPOINT,
 } from "./constants";
+import { diffChanges } from "./diff";
 import { getContentHash } from "./helpers";
 import { getSnapshotIdentifier } from "./jest";
 import { getLogger } from "./logging";
@@ -132,6 +133,27 @@ export const extendExpectDesignReviewer = (unsafeArgs: DesignReviewMatcher) => {
       }
 
       if (!model?.modelName || !model?.key) {
+        // if we're in CI, run a diff. If there is a diff, the snapshot changed, and we should throw an error.
+        if (process.env.CI && existingSnapshotFileContent) {
+          try {
+            const diff = await diffChanges(
+              existingSnapshotFileContent,
+              received.outerHTML,
+            );
+            if (diff) {
+              return {
+                pass: false,
+                message: () =>
+                  `Snapshot has changed in a CI environment.\n\n${diff}`,
+              };
+            }
+          } catch (error) {
+            logger.debug(
+              "Unable to diff changes in CI environment. Skipping diff check.",
+            );
+          }
+        }
+
         throw new Error(
           process.env.CI
             ? `vslint is running in a CI environment but ${existingSnapshotFileContent ? "design snapshot contents have changed in this environment." : "no design snapshot found for this test."} vslint should never generate snapshots in CI as this could cause unintended model usage. Make sure to run this test locally and commit the results so re-review doesn't happen in CI.`
