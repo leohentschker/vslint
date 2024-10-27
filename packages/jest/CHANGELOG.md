@@ -1,5 +1,12 @@
 # @vslint/jest
 
+## 0.2.13
+
+### Patch Changes
+
+- cc0a2f9: Change the error in CI to be the html snapshot diff
+- e1b4689: Updates logging behavior to make it clearer whether the file's html change
+
 ## 0.2.12
 
 ### Patch Changes
