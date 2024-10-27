@@ -31,7 +31,7 @@ jobs:
         run: npm run ci
 
       - name: Run Changesets
-        uses: changesets/action@v2
+        uses: changesets/action@v1
         with:
           publish: npm
         env:
