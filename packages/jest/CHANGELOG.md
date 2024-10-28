@@ -1,5 +1,11 @@
 # @vslint/jest
 
+## 0.2.14
+
+### Patch Changes
+
+- 900f36f: Updating logging behavior to not use diff
+
 ## 0.2.13
 
 ### Patch Changes
