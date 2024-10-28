@@ -135,23 +135,11 @@ export const extendExpectDesignReviewer = (unsafeArgs: DesignReviewMatcher) => {
       if (!model?.modelName || !model?.key) {
         // if we're in CI, run a diff. If there is a diff, the snapshot changed, and we should throw an error.
         if (process.env.CI && existingSnapshotFileContent) {
-          try {
-            const diff = await diffChanges(
-              existingSnapshotFileContent,
-              received.outerHTML,
-            );
-            if (diff) {
-              return {
-                pass: false,
-                message: () =>
-                  `Snapshot has changed in a CI environment.\n\n${diff}`,
-              };
-            }
-          } catch (error) {
-            logger.debug(
-              "Unable to diff changes in CI environment. Skipping diff check.",
-            );
-          }
+          return {
+            pass: false,
+            message: () =>
+              `Snapshot has changed in a CI environment.\n\n${received.outerHTML}`,
+          };
         }
 
         throw new Error(
