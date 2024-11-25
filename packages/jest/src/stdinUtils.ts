@@ -1,5 +1,5 @@
-import readline from "node:readline";
 import process from "node:process";
+import readline from "node:readline";
 
 /**
  * Prompts the user to accept or reject a yes/no question and returns a boolean

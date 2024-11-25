@@ -1,9 +1,8 @@
-import { validateViolations } from "./userPrompting";
-import { acceptYesNoInput } from "./stdinUtils";
-import { vi, describe, beforeEach, test, expect, Mock } from "vitest";
 import type { ReviewResponse } from "@vslint/shared";
+import { type Mock, beforeEach, describe, expect, test, vi } from "vitest";
+import { acceptYesNoInput } from "./stdinUtils";
+import { validateViolations } from "./userPrompting";
 
-// Mocking acceptYesNoInput from inputUtils to simulate user input
 vi.mock("./stdinUtils", () => ({
   acceptYesNoInput: vi.fn(),
   displayImg: vi.fn(),
