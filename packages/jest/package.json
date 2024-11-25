@@ -29,6 +29,7 @@
   },
   "dependencies": {
     "@vslint/shared": "^0.0.9",
-    "axios": "^1.7.7"
+    "axios": "^1.7.7",
+    "terminal-image": "^3.0.0"
   }
 }

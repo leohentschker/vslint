@@ -24,6 +24,7 @@ import {
   type DesignReviewRun,
   DesignReviewRunSchema,
 } from "./types";
+import { validateViolations } from "./userPrompting";
 
 global.setImmediate =
   global.setImmediate ||
@@ -192,13 +193,16 @@ export const extendExpectDesignReviewer = (unsafeArgs: DesignReviewMatcher) => {
         designSnapshotsDir,
         `${snapshotIdentifier}.png`,
       );
-      fs.writeFileSync(
-        imageSnapshotPath,
-        Buffer.from(response.data.content, "base64"),
+      const imageBuffer = Buffer.from(response.data.content, "base64");
+      fs.writeFileSync(imageSnapshotPath, imageBuffer);
+
+      const userValidatedResponse = await validateViolations(
+        imageBuffer,
+        response.data,
       );
 
       const reviewMarkdown = reviewResponseToMarkdown(
-        response.data,
+        userValidatedResponse,
         imageSnapshotPath,
       );
       if (

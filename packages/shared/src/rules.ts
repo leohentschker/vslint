@@ -18,7 +18,7 @@ export const DEFAULT_RULES: Rule[] = [
   {
     ruleid: "text-too-wide",
     description:
-      "First write out how many characters are on each line of text. If a single line of text, as it appears between line breaks (aka newlines), contains more than 75 characters, excluding spaces and punctuation, mark it as true and explain which line is too long; otherwise, mark it as false.",
+      "First write out how many words are on each line of text. If a single line of text, as it appears between line breaks (aka newlines), contains more than 30 words, excluding spaces and punctuation, mark it as true and explain which line is too long; otherwise, mark it as false.",
   },
   {
     ruleid: "bad-gray-colors",
