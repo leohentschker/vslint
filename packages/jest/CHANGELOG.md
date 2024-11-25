@@ -1,5 +1,13 @@
 # @vslint/jest
 
+## 0.2.15
+
+### Patch Changes
+
+- b716a15: Bumps rule for too wide, adds in terminal display of images and confirmation
+- Updated dependencies [b716a15]
+  - @vslint/shared@0.0.10
+
 ## 0.2.14
 
 ### Patch Changes

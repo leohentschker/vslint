@@ -1,5 +1,11 @@
 # @vslint/shared
 
+## 0.0.10
+
+### Patch Changes
+
+- b716a15: Bumps rule for too wide, adds in terminal display of images and confirmation
+
 ## 0.0.9
 
 ### Patch Changes
