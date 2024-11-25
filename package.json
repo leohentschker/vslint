@@ -28,6 +28,7 @@
     "check": "biome check",
     "ci": "npm run build && npm run check && npm run test && npm run check-exports",
     "check-exports": "attw --pack ./packages/*",
+    "start-release": "changeset",
     "local-release": "changeset version && changeset publish",
     "prepublishOnly": "npm run ci"
   },
