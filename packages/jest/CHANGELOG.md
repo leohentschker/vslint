@@ -1,5 +1,11 @@
 # @vslint/jest
 
+## 0.2.16
+
+### Patch Changes
+
+- ea35cdc: Block override code if we are not in a TTY environment
+
 ## 0.2.15
 
 ### Patch Changes
