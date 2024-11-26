@@ -22,7 +22,11 @@ describe("validateViolations", () => {
   test("Overriding failing tests: turns a failing result into a passing result", async () => {
     (acceptYesNoInput as Mock).mockResolvedValueOnce(true);
 
-    const result = await validateViolations(Buffer.from(""), reviewResponse);
+    const result = await validateViolations(
+      "",
+      Buffer.from(""),
+      reviewResponse,
+    );
 
     expect(result.violations.rule1?.fail).toBe(true);
   });
@@ -30,7 +34,11 @@ describe("validateViolations", () => {
   test('Preserving failing tests: keeps a failing result when input is "n"', async () => {
     (acceptYesNoInput as Mock).mockResolvedValueOnce(false);
 
-    const result = await validateViolations(Buffer.from(""), reviewResponse);
+    const result = await validateViolations(
+      "",
+      Buffer.from(""),
+      reviewResponse,
+    );
 
     expect(result.violations.rule1?.fail).toBe(false);
   });
@@ -41,7 +49,7 @@ describe("validateViolations", () => {
     });
 
     await expect(
-      validateViolations(Buffer.from(""), reviewResponse),
+      validateViolations("", Buffer.from(""), reviewResponse),
     ).rejects.toThrow("Invalid input too many times. Please try again.");
   });
 });

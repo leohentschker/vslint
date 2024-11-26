@@ -12,13 +12,15 @@ import { acceptYesNoInput, displayImg } from "./stdinUtils";
  * for any failed rules within the terminal if they are false positives.
  */
 export const validateViolations = async (
+  imagePath: string,
   imageBuffer: Buffer,
   reviewResponse: ReviewResponse,
 ) => {
   try {
     await displayImg(imageBuffer);
   } catch (err) {
-    getLogger().warn(`Error while displaying image: ${err}`);
+    getLogger().info(`Error while displaying image: ${err}`);
+    console.log("Image path:", imagePath);
   }
 
   const updatedReview = { ...reviewResponse };
