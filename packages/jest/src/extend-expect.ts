@@ -13,7 +13,6 @@ import {
   DEFAULT_DESIGN_SNAPSHOT_DIR,
   DEFAULT_REVIEW_ENDPOINT,
 } from "./constants";
-import { diffChanges } from "./diff";
 import { getContentHash } from "./helpers";
 import { getSnapshotIdentifier } from "./jest";
 import { getLogger } from "./logging";
@@ -196,10 +195,15 @@ export const extendExpectDesignReviewer = (unsafeArgs: DesignReviewMatcher) => {
       const imageBuffer = Buffer.from(response.data.content, "base64");
       fs.writeFileSync(imageSnapshotPath, imageBuffer);
 
-      const userValidatedResponse = await validateViolations(
-        imageBuffer,
-        response.data,
-      );
+      let userValidatedResponse: ReviewResponse = response.data;
+
+      if (process.stdin.isTTY) {
+        userValidatedResponse = await validateViolations(
+          imageSnapshotPath,
+          imageBuffer,
+          response.data,
+        );
+      }
 
       const reviewMarkdown = reviewResponseToMarkdown(
         userValidatedResponse,
