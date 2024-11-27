@@ -1,5 +1,13 @@
 # @vslint/jest
 
+## 0.3.2
+
+### Patch Changes
+
+- 3bfb8fe: Removing unused deps and files
+- Updated dependencies [3bfb8fe]
+  - @vslint/shared@0.0.13
+
 ## 0.3.1
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @vslint/shared
 
+## 0.0.13
+
+### Patch Changes
+
+- 3bfb8fe: Removing unused deps and files
+
 ## 0.0.12
 
 ### Patch Changes
