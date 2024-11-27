@@ -5,6 +5,7 @@
 ### Patch Changes
 
 - 174a548: Patching rules
+- 4ce9c79: Updating rules and logging improvements
 
 ## 0.0.13
 

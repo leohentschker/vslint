@@ -6,6 +6,8 @@
 
 - 174a548: Patching rules
 - Updated dependencies [174a548]
+- 4ce9c79: Updating rules and logging improvements
+- Updated dependencies [4ce9c79]
   - @vslint/shared@0.0.14
 
 ## 0.3.2
