@@ -120,7 +120,7 @@ export const extendExpectDesignReviewer = (unsafeArgs: DesignReviewMatcher) => {
 
       const logger = getLogger(params?.log);
 
-      const strict = params?.strict || globalStrict;
+      const strict = params?.strict ?? globalStrict;
 
       if (!elementIsHTMLElement(received)) {
         const errorMessage =
@@ -227,6 +227,7 @@ export const extendExpectDesignReviewer = (unsafeArgs: DesignReviewMatcher) => {
       const imageBuffer = Buffer.from(response.data.content, "base64");
       fs.writeFileSync(imageSnapshotPath, imageBuffer);
       console.log(imageSnapshotPath);
+      console.log(matcherContext.snapshotState._snapshotPath);
 
       return { pass: true, message: () => explanation || "" };
     },
