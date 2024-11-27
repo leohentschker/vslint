@@ -1,5 +1,11 @@
 # @vslint/shared
 
+## 0.0.15
+
+### Patch Changes
+
+- 028c5f6: Bumps shared version
+
 ## 0.0.14
 
 ### Patch Changes
