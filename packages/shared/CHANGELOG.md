@@ -1,5 +1,11 @@
 # @vslint/shared
 
+## 0.0.11
+
+### Patch Changes
+
+- fefbde7: Using jest snapshots instead of custom implementation
+
 ## 0.0.10
 
 ### Patch Changes

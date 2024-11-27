@@ -1,5 +1,16 @@
 # @vslint/jest
 
+## 0.3.0
+
+### Minor Changes
+
+- fefbde7: Using jest snapshots instead of custom implementation
+
+### Patch Changes
+
+- Updated dependencies [fefbde7]
+  - @vslint/shared@0.0.11
+
 ## 0.2.16
 
 ### Patch Changes
