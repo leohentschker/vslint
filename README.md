@@ -5,10 +5,9 @@
 # vslint (visual eslint) - use AI to enforce UI/UX patterns
 ![Sample test output showing design review feedback](./assets/sample_test_output.png)
 **TLDR**: Custom matcher for React testing frameworks that uses multi-modal AI models to enforce UI/UX patterns.
-* Supports the Jest testing framework
-* Uses chromium to render html snapshots
+* Supports the Jest testing framework and follows Jest's snapshot testing pattern
 * Supports OpenAI and Gemini (in beta) models for analysis
-* Creates snapshot files in Markdown format to store the results of automated testing
+* Uses chromium to render html snapshots
 * Supports running a local review server with `npx @vslint/server` or in the cloud with a Dockerfile
 
 ```typescript
@@ -23,7 +22,7 @@ expect.extend(extendExpectDesignReviewer({
 }));
 
 test('text content that is too wide on desktop screens and is not legible', async () => {
-  const { container } = render(<div>Incredibly long content potentially too long. Human readability is best at a maximum of 75 characters</div>);
+  const { container } = render(<div>Incredibly long content potentially too long. Human readability is best when lines are not as long and have fewer words on a single line, this div should have fewer words, really. It's just rude.</div>);
   await expect(container).toPassDesignReview();
 }, DEFAULT_REVIEW_TIMEOUT);
 ```
@@ -35,15 +34,11 @@ npm install @vslint/jest --save-dev
 ```
 
 #### Creating the design review matcher
-The first step is to extend jest's expect to include a new matcher that performs the design review.
+The first step is to extend jest's expect to include a new matcher that performs the design review. This should likely be done via the `setupFilesAfterEnv` flag in the Jest config.
 ```typescript
 import { extendExpectDesignReviewer } from '@vslint/jest';
 
 expect.extend(extendExpectDesignReviewer({
-  // optional, where should snapshot files be stored so we don't have to call the model again
-  // every time we run tests. Defaults to to '__tests__/__design_snapshots__', but can can be
-  // overridden. Will be created if it doesn't exist!
-  snapshotsDir: '__tests__/__design_snapshots__',
   // global CSS paths that enable correct rendering
   customStyles: ['./styles/globals.css'],
   // model config to determine which provider to use for analysis
@@ -59,6 +54,7 @@ expect.extend(extendExpectDesignReviewer({
 | Parameter                | type     | default                  | Description
 | ------------------------ | -------- | ------------------------ | -------------------------------------------------------------------------------------------------------------------------- |
 | `customStyles`                  | `string[]`   |                          | The path to the css file that is used to generate the hash of the css file and the snapshot.
+| `strict`                      | `boolean`   | `true`                    | If true, tests will fail if any of the rules fail. If false, the test will pass if any of the rules pass but still log the results
 | `model`                    | `{ modelName: string; key: string }`  |         | API credentials for the design review model. Supported models are `gpt-4o`, `gpt-4o-mini` and `gemini-1.5-flash`
 | `snapshotsDir`             | `string`   |  `__tests__/__design_snapshots__`        | The directory where the snapshots are stored.
 | `reviewEndpoint`          | `string`   | `https://vslint-644118703752.us-central1.run.app/api/v1/design-review` | The endpoint to use for the review server. Defaults to a shared review server.
@@ -85,6 +81,7 @@ test('render text that is too long and hard to read', async () => {
 | ------------------------ | -------- | ------------------------ | -------------------------------------------------------------------------------------------------------------------------- |
 | `atSize`                  | `string` | `{ width: number; height: number;}`   | `{ width: 1920, height: 1080 }`                    | The viewport size to render the content at. Can be `full-screen`, `mobile`, `tablet`, `sm`, `md`, `lg`, `xl`, `2xl`, `3xl`
 | `log`                     | `string` or `winston.Logger`  | `info`                    | Allows you to set a log level or pass in a custom Winston logger.
+| `strict`                  | `boolean`                    | `true`                    | If true, this test will fail if any of the rules fail. If false, the test will pass if any of the rules pass but still log the results. This overrides the global `strict` setting.
 
 ## Accessing a review server
 ### Run using `npx`
