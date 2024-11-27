@@ -208,7 +208,6 @@ export const extendExpectDesignReviewer = (unsafeArgs: DesignReviewMatcher) => {
         expect(snapshotData).toMatchSnapshot();
         if (!pass) {
           getLogger().error(explanation);
-          displayImg(Buffer.from(received.outerHTML, "base64"));
         }
       } catch (err) {
         return { pass: false, message: () => "Failed to match snapshot" };
@@ -228,6 +227,7 @@ export const extendExpectDesignReviewer = (unsafeArgs: DesignReviewMatcher) => {
       );
       const imageBuffer = Buffer.from(response.data.content, "base64");
       fs.writeFileSync(imageSnapshotPath, imageBuffer);
+      console.log(imageSnapshotPath);
 
       return { pass: true, message: () => explanation || "" };
     },
