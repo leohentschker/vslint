@@ -48,7 +48,7 @@ export const DEFAULT_RULES: Rule[] = [
   {
     ruleid: "no-bad-copy",
     description:
-      "Copy should look professional, not be repetitive, and be at a high quality. It should have no typos or glaring errors. If the product copy is not good, mark it as true; otherwise mark it as false.",
+      "Copy should look generally professional, not be repetitive, and should have no typos and no glaring errors. If the product copy is not good, mark it as true; otherwise mark it as false.",
   },
   {
     ruleid: "no-default-checkboxes",
@@ -63,6 +63,6 @@ export const DEFAULT_RULES: Rule[] = [
   {
     ruleid: "no-unconstrained-width",
     description:
-      "Content should generally not be the full screen width at very large screen sizes and should instead be constrained on a max width. This only applies for full page layouts. If content in a full page layout stretches very wide on large screens, mark it as true; otherwise mark it as false.",
+      "First note how many pixels wide the screen is, assuming a DPI of 72. If the screen is less than 1440px wide, this rule does not apply and return false. Otherwise, content should generally not be the full screen width at very large screen sizes and should instead be constrained on a max width. If content in a full page layout stretches very wide on large screens, mark it as true; otherwise mark it as false.",
   },
 ];
