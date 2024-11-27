@@ -23,7 +23,7 @@ export const DEFAULT_RULES: Rule[] = [
   {
     ruleid: "bad-gray-colors",
     description:
-      "First note the font weights of each line of text. This rule does not apply to fonts with different weights. Gray text with the same font weight should have the same color. If text components have different shades of gray for the same font weight, mark it as true; otherwise, mark it as false.",
+      "First note the font weights of each line of text. This rule does not apply to fonts with different weights or text inside of input elements. IGNORE INPUT ELEMENTS. Gray text with the same font weight should have the same color. If text components have different shades of gray for the same font weight, mark it as true; otherwise, mark it as false.",
   },
   {
     ruleid: "missing-placeholders",
@@ -38,12 +38,12 @@ export const DEFAULT_RULES: Rule[] = [
   {
     ruleid: "no-half-width-forms",
     description:
-      "This rule only applies to forms, return false if the component is not a form. Look at the last row of forms and count the number of components. If there is only one component on the last row, it should take up the full width. However, if there are two or more components on the last row, they can be half-width or appropriately distributed. If there is just one component on the last row and it doesn't take up the full width, mark it as true; otherwise, mark it as false.",
+      "This rule only applies to forms with >1 rows. If there is one row return false. Look at the last row of forms and count the number of components. If there is only one component on the last row, it should take up the full width. However, if there are two or more components on the last row, they can be half-width or appropriately distributed. If there is just one component on the last row and it doesn't take up the full width, mark it as true; otherwise, mark it as false.",
   },
   {
     ruleid: "minimal-forms",
     description:
-      "This rule only applies to forms, return false if the component is not a form. Forms should not use too many full width components and should instead collapse them into one row of two half-width components. If there are back to back full width components in your form, mark it as true; otherwise mark it as false.",
+      "This rule only applies to forms with >2 elements. Forms should not use too many full width components and should instead collapse them into one row of two half-width components. If there are back to back full width components in your form, mark it as true; otherwise mark it as false.",
   },
   {
     ruleid: "no-bad-copy",
