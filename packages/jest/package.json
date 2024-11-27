@@ -28,10 +28,7 @@
     }
   },
   "dependencies": {
-    "@inquirer/confirm": "^5.0.2",
-    "@inquirer/prompts": "^7.1.0",
     "@vslint/shared": "^0.0.12",
-    "axios": "^1.7.7",
-    "terminal-image": "^3.0.0"
+    "axios": "^1.7.7"
   }
 }

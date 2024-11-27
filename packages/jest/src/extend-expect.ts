@@ -13,7 +13,6 @@ import { getContentHash } from "./helpers";
 import { getSnapshotIdentifier } from "./jest";
 import { getLogger } from "./logging";
 import { elementIsHTMLElement } from "./render";
-import { displayImg } from "./stdinUtils";
 import {
   type DesignReviewMatcher,
   DesignReviewMatcherSchema,
