@@ -1,5 +1,11 @@
 # @vslint/shared
 
+## 0.0.14
+
+### Patch Changes
+
+- 174a548: Patching rules
+
 ## 0.0.13
 
 ### Patch Changes

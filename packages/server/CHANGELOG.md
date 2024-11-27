@@ -1,5 +1,13 @@
 # @vslint/server
 
+## 0.2.11
+
+### Patch Changes
+
+- 174a548: Patching rules
+- Updated dependencies [174a548]
+  - @vslint/shared@0.0.14
+
 ## 0.2.10
 
 ### Patch Changes

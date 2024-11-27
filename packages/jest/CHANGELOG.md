@@ -1,5 +1,13 @@
 # @vslint/jest
 
+## 0.3.3
+
+### Patch Changes
+
+- 174a548: Patching rules
+- Updated dependencies [174a548]
+  - @vslint/shared@0.0.14
+
 ## 0.3.2
 
 ### Patch Changes
