@@ -203,13 +203,9 @@ export const extendExpectDesignReviewer = (unsafeArgs: DesignReviewMatcher) => {
       };
 
       // Use Jest's built-in snapshot functionality and directly return
-      try {
-        expect(snapshotData).toMatchSnapshot();
-        if (!pass) {
-          getLogger().error(explanation);
-        }
-      } catch (err) {
-        return { pass: false, message: () => "Failed to match snapshot" };
+      expect(snapshotData).toMatchSnapshot();
+      if (!pass) {
+        getLogger().error(explanation);
       }
 
       const imageSnapshotFolder = path.join(
