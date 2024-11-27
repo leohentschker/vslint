@@ -10,6 +10,5 @@ export default defineConfig({
   format: ["cjs", "esm"],
   dts: true,
   outDir: distDir,
-  clean: true,
-  onSuccess: "cp ../../README.md dist/",
+  clean: true
 });
