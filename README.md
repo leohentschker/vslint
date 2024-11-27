@@ -6,7 +6,7 @@
 ![Sample test output showing design review feedback](./assets/sample_test_output.png)
 **TLDR**: Custom matcher for React testing frameworks that uses multi-modal AI models to enforce UI/UX patterns.
 * Supports the Jest testing framework and follows Jest's snapshot testing pattern
-* Supports OpenAI and Gemini (in beta) models for analysis
+* Supports using OpenAI models for analysis
 * Uses chromium to render html snapshots
 * Supports running a local review server with `npx @vslint/server` or in the cloud with a Dockerfile
 
@@ -54,9 +54,8 @@ expect.extend(extendExpectDesignReviewer({
 | Parameter                | type     | default                  | Description
 | ------------------------ | -------- | ------------------------ | -------------------------------------------------------------------------------------------------------------------------- |
 | `customStyles`                  | `string[]`   |                          | The path to the css file that is used to generate the hash of the css file and the snapshot.
-| `strict`                      | `boolean`   | `true`                    | If true, tests will fail if any of the rules fail. If false, the test will pass if any of the rules pass but still log the results
-| `model`                    | `{ modelName: string; key: string }`  |         | API credentials for the design review model. Supported models are `gpt-4o`, `gpt-4o-mini` and `gemini-1.5-flash`
-| `snapshotsDir`             | `string`   |  `__tests__/__design_snapshots__`        | The directory where the snapshots are stored.
+| `strict`                  | `boolean`   | `true`                    | If true, tests will fail if any of the rules fail. If false, the test will pass and the snapshot will be logged with the results.
+| `model`                   | `{ modelName: string; key: string }`  |         | API credentials for the design review model. Supported models are `gpt-4o`, `gpt-4o-mini` and `gemini-1.5-flash`
 | `reviewEndpoint`          | `string`   | `https://vslint-644118703752.us-central1.run.app/api/v1/design-review` | The endpoint to use for the review server. Defaults to a shared review server.
 | `log`                     | `string` or `winston.Logger`  | `info`                    | Allows you to set a log level or pass in a custom Winston logger.
 
@@ -81,7 +80,7 @@ test('render text that is too long and hard to read', async () => {
 | ------------------------ | -------- | ------------------------ | -------------------------------------------------------------------------------------------------------------------------- |
 | `atSize`                  | `string` | `{ width: number; height: number;}`   | `{ width: 1920, height: 1080 }`                    | The viewport size to render the content at. Can be `full-screen`, `mobile`, `tablet`, `sm`, `md`, `lg`, `xl`, `2xl`, `3xl`
 | `log`                     | `string` or `winston.Logger`  | `info`                    | Allows you to set a log level or pass in a custom Winston logger.
-| `strict`                  | `boolean`                    | `true`                    | If true, this test will fail if any of the rules fail. If false, the test will pass if any of the rules pass but still log the results. This overrides the global `strict` setting.
+| `strict`                  | `boolean`                    | `true`                    | If true, this test will fail if any of the rules fail. If false, the test will pass and the snapshot will be logged with the failing results. This overrides the global `strict` setting.
 
 ## Accessing a review server
 ### Run using `npx`
