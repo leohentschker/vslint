@@ -11,5 +11,4 @@ export default defineConfig({
   dts: true,
   outDir: distDir,
   clean: true,
-  onSuccess: "cp ../../README.md dist/",
 });
