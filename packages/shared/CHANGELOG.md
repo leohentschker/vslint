@@ -1,5 +1,11 @@
 # @vslint/shared
 
+## 0.0.14
+
+### Patch Changes
+
+- 4ce9c79: Updating rules and logging improvements
+
 ## 0.0.13
 
 ### Patch Changes
