@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - DEV-enable-auto-changeset-publish
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
