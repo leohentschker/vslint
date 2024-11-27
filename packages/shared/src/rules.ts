@@ -23,7 +23,7 @@ export const DEFAULT_RULES: Rule[] = [
   {
     ruleid: "bad-gray-colors",
     description:
-      "First note the font weights of each line of text. This rule does not apply to fonts with different weights or text inside of input elements. IGNORE INPUT ELEMENTS. Gray text with the same font weight should have the same color. If text components have different shades of gray for the same font weight, mark it as true; otherwise, mark it as false.",
+      "First note the font weights of each line of text that is not in an input element. This rule does not apply to fonts with different weights or text inside of input elements. IGNORE INPUT ELEMENTS AND PLACEHOLDERS. Gray text with the same font weight should have the same color. If text components have very different shades of gray for the same font weight, mark it as true; otherwise, mark it as false.",
   },
   {
     ruleid: "missing-placeholders",

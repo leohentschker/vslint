@@ -130,8 +130,20 @@ export const extendExpectDesignReviewer = (unsafeArgs: DesignReviewMatcher) => {
       }
 
       const matcherContext = this as unknown as jest.MatcherContext;
-
       const existingSnapshot = getExistingSnapshot(matcherContext);
+
+      const imageSnapshotFolder = path.join(
+        path.dirname(matcherContext.snapshotState._snapshotPath),
+        "vslint",
+      );
+      if (!fs.existsSync(imageSnapshotFolder)) {
+        fs.mkdirSync(imageSnapshotFolder, { recursive: true });
+      }
+      const imageSnapshotPath = path.join(
+        imageSnapshotFolder,
+        `${getSnapshotIdentifier(matcherContext, params)}.png`,
+      );
+
       // skip review if the snapshot already exists and the content hash matches
       if (existingSnapshot) {
         if (
@@ -146,7 +158,7 @@ export const extendExpectDesignReviewer = (unsafeArgs: DesignReviewMatcher) => {
             message =
               "Snapshot already exists, content hash matches, previous review failed, but strict mode is disabled";
           } else {
-            message = `Review failed and strict mode is enabled for rules ${existingSnapshot.failedRules.join(", ")}. Set strict: false to skip review for this test.`;
+            message = `Review failed and strict mode is enabled. Test failed rules: ${existingSnapshot.failedRules.join(", ")}. Set strict: false to skip review for this test. You can delete the snapshot file at ${matcherContext.snapshotState._snapshotPath} to force a new review. Review the snapshot at ${imageSnapshotPath} to see what failed.`;
           }
           return {
             pass: existingSnapshot.pass || !strict,
@@ -208,24 +220,12 @@ export const extendExpectDesignReviewer = (unsafeArgs: DesignReviewMatcher) => {
         getLogger().error(explanation);
       }
 
-      const imageSnapshotFolder = path.join(
-        path.dirname(matcherContext.snapshotState._snapshotPath),
-        "vslint",
-      );
-      if (!fs.existsSync(imageSnapshotFolder)) {
-        fs.mkdirSync(imageSnapshotFolder, { recursive: true });
-      }
-
-      const imageSnapshotPath = path.join(
-        imageSnapshotFolder,
-        `${getSnapshotIdentifier(matcherContext, params)}.png`,
-      );
       const imageBuffer = Buffer.from(response.data.content, "base64");
       fs.writeFileSync(imageSnapshotPath, imageBuffer);
       console.log(imageSnapshotPath);
       console.log(matcherContext.snapshotState._snapshotPath);
 
-      return { pass: true, message: () => explanation || "" };
+      return { pass: pass || !strict, message: () => explanation || "" };
     },
   };
 };
