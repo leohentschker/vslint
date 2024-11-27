@@ -10,5 +10,5 @@ export default defineConfig({
   format: ["cjs", "esm"],
   dts: true,
   outDir: distDir,
-  clean: true
+  clean: true,
 });
