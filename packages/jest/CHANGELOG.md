@@ -1,5 +1,13 @@
 # @vslint/jest
 
+## 0.3.1
+
+### Patch Changes
+
+- 9fc3298: Tiny bump on all
+- Updated dependencies [9fc3298]
+  - @vslint/shared@0.0.12
+
 ## 0.3.0
 
 ### Minor Changes
