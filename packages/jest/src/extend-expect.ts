@@ -5,25 +5,57 @@ import {
   type ReviewRequest,
   type ReviewResponse,
   getViewportSize,
-  markdownToReviewResponse,
-  reviewResponseToMarkdown,
 } from "@vslint/shared";
 import axios, { type AxiosError, type AxiosResponse } from "axios";
-import {
-  DEFAULT_DESIGN_SNAPSHOT_DIR,
-  DEFAULT_REVIEW_ENDPOINT,
-} from "./constants";
+import Json5 from "json5";
+import { DEFAULT_REVIEW_ENDPOINT } from "./constants";
 import { getContentHash } from "./helpers";
 import { getSnapshotIdentifier } from "./jest";
 import { getLogger } from "./logging";
 import { elementIsHTMLElement } from "./render";
+import { displayImg } from "./stdinUtils";
 import {
   type DesignReviewMatcher,
   DesignReviewMatcherSchema,
   type DesignReviewRun,
   DesignReviewRunSchema,
+  JestSnapshotDataSchema,
 } from "./types";
-import { validateViolations } from "./userPrompting";
+
+const getExistingSnapshot = (matcherContext: jest.MatcherContext) => {
+  const snapshotState = matcherContext.snapshotState; // Jest's snapshot state
+  const currentTestName = matcherContext.currentTestName; // Current test name
+  const count = snapshotState._counters.get(currentTestName) || 0;
+  const snapshotKey = `${currentTestName} ${count + 1}`;
+  let snapshotData = snapshotState._snapshotData[snapshotKey];
+  if (!snapshotData) {
+    return null;
+  }
+  snapshotData = snapshotData.replace(/^\\n/, "").trim();
+
+  let parsedJson: unknown;
+  try {
+    parsedJson = Json5.parse(snapshotData);
+  } catch (err) {
+    return null;
+  }
+
+  const { data: parsedSnapshotData, error: parseError } =
+    JestSnapshotDataSchema.safeParse(parsedJson);
+  if (parseError) {
+    return null;
+  }
+  return parsedSnapshotData;
+};
+
+const markSnapshotAsReviewed = (matcherContext: jest.MatcherContext) => {
+  const snapshotState = matcherContext.snapshotState;
+  const currentTestName = matcherContext.currentTestName;
+  const count = snapshotState._counters.get(currentTestName) || 0;
+  const snapshotKey = `${currentTestName} ${count + 1}`;
+  snapshotState._counters.set(currentTestName, count + 1);
+  snapshotState._uncheckedKeys.delete(snapshotKey);
+};
 
 global.setImmediate =
   global.setImmediate ||
@@ -47,8 +79,14 @@ export const extendExpectDesignReviewer = (unsafeArgs: DesignReviewMatcher) => {
   if (extendValidationError) {
     throw new Error(extendValidationError.message);
   }
-  const { customStyles, snapshotsDir, reviewEndpoint, model, rules } = args;
-  const designSnapshotsDir = snapshotsDir || DEFAULT_DESIGN_SNAPSHOT_DIR;
+  const {
+    customStyles,
+    reviewEndpoint,
+    model,
+    rules,
+    strict: globalStrict,
+  } = args;
+
   for (const cssPath of customStyles) {
     if (!fs.existsSync(cssPath)) {
       throw new Error(
@@ -57,13 +95,6 @@ export const extendExpectDesignReviewer = (unsafeArgs: DesignReviewMatcher) => {
     }
   }
 
-  // if the snapshots directory does not exist, log and create it
-  if (!fs.existsSync(designSnapshotsDir)) {
-    fs.mkdirSync(designSnapshotsDir, { recursive: true });
-    getLogger().warn(
-      `Created snapshots directory at path ${designSnapshotsDir}`,
-    );
-  }
   const stylesheets = customStyles.map((cssPath) =>
     fs.readFileSync(cssPath, "utf8"),
   );
@@ -88,22 +119,9 @@ export const extendExpectDesignReviewer = (unsafeArgs: DesignReviewMatcher) => {
         };
       }
 
-      const snapshotIdentifier = getSnapshotIdentifier(
-        expect.getState(),
-        params,
-      );
       const logger = getLogger(params?.log);
 
-      const snapshotPath = path.join(
-        designSnapshotsDir,
-        `${snapshotIdentifier}.md`,
-      );
-      logger.debug(`Snapshot path: ${snapshotPath}`);
-
-      const snapshotFileExists = fs.existsSync(snapshotPath);
-      if (snapshotFileExists)
-        logger.debug("Snapshot file exists, pulling existing data");
-      else logger.debug("Snapshot file does not exist, creating new snapshot");
+      const strict = params?.strict || globalStrict;
 
       if (!elementIsHTMLElement(received)) {
         const errorMessage =
@@ -112,41 +130,30 @@ export const extendExpectDesignReviewer = (unsafeArgs: DesignReviewMatcher) => {
         return { pass: false, message: () => errorMessage };
       }
 
-      const existingSnapshotFileContent =
-        fs.existsSync(snapshotPath) && fs.readFileSync(snapshotPath, "utf8");
-      const existingSnapshot: Partial<ReviewResponse> =
-        existingSnapshotFileContent
-          ? markdownToReviewResponse(existingSnapshotFileContent)
-          : {};
+      const matcherContext = this as unknown as jest.MatcherContext;
 
-      if (existingSnapshot.contentHash === getContentHash(received.outerHTML)) {
-        logger.debug(
-          `Snapshot ${snapshotPath} already exists and has the same content hash. Skipping review. To force a review, pass the option { forceReview: true } to your expect call.`,
-        );
-        return {
-          pass: !!existingSnapshot.pass,
-          message: () =>
-            existingSnapshot.pass
-              ? "Snapshot passed design review"
-              : `Snapshot failed design review.\n${existingSnapshot.explanation}\n\nTo override this, update the value of pass to true in ${snapshotPath}`,
-        };
-      }
-
-      if (!model?.modelName || !model?.key) {
-        // if we're in CI, run a diff. If there is a diff, the snapshot changed, and we should throw an error.
-        if (process.env.CI && existingSnapshotFileContent) {
+      const existingSnapshot = getExistingSnapshot(matcherContext);
+      // skip review if the snapshot already exists and the content hash matches
+      if (existingSnapshot) {
+        if (
+          existingSnapshot.contentHash === getContentHash(received.outerHTML)
+        ) {
+          markSnapshotAsReviewed(matcherContext);
+          let message: string;
+          if (existingSnapshot.pass) {
+            message =
+              "Snapshot already exists, content hash matches, and the previous review passed";
+          } else if (!strict) {
+            message =
+              "Snapshot already exists, content hash matches, previous review failed, but strict mode is disabled";
+          } else {
+            message = `Review failed and strict mode is enabled for rules ${existingSnapshot.failedRules.join(", ")}. Set strict: false to skip review for this test.`;
+          }
           return {
-            pass: false,
-            message: () =>
-              `Snapshot has changed in a CI environment.\n\n${received.outerHTML}`,
+            pass: existingSnapshot.pass || !strict,
+            message: () => message,
           };
         }
-
-        throw new Error(
-          process.env.CI
-            ? `vslint is running in a CI environment but ${existingSnapshotFileContent ? "design snapshot contents have changed in this environment." : "no design snapshot found for this test."} vslint should never generate snapshots in CI as this could cause unintended model usage. Make sure to run this test locally and commit the results so re-review doesn't happen in CI.`
-            : "Component changed but can't re-run review as model name and key are not correctly set in `extendExpectDesignReviewer`. If you are setting the model key with an environment variable, make sure that `process.env.OPENAI_API_KEY` or `process.env.GEMINI_API_KEY` is set by running export OPENAI_API_KEY=...",
-        );
       }
 
       const viewport = getViewportSize(params);
@@ -183,53 +190,46 @@ export const extendExpectDesignReviewer = (unsafeArgs: DesignReviewMatcher) => {
             `Error while sending request to review endpoint: ${axiosError.message}`,
         };
       }
-      const { content, explanation, pass, ...violations } = response.data;
+      const { explanation, pass, violations } = response.data;
       logger.debug(
         `Review result: ${JSON.stringify(violations, null, 2)}. Explanation: ${explanation}`,
       );
 
+      const snapshotData = {
+        contentHash: getContentHash(received.outerHTML),
+        pass,
+        failedRules: Object.entries(violations)
+          .filter(([_, rule]) => rule.fail)
+          .map(([ruleName]) => ruleName),
+      };
+
+      // Use Jest's built-in snapshot functionality and directly return
+      try {
+        expect(snapshotData).toMatchSnapshot();
+        if (!pass) {
+          getLogger().error(explanation);
+        }
+      } catch (err) {
+        return { pass: false, message: () => "Failed to match snapshot" };
+      }
+
+      const imageSnapshotFolder = path.join(
+        path.dirname(matcherContext.snapshotState._snapshotPath),
+        "vslint",
+      );
+      if (!fs.existsSync(imageSnapshotFolder)) {
+        fs.mkdirSync(imageSnapshotFolder, { recursive: true });
+      }
+
       const imageSnapshotPath = path.join(
-        designSnapshotsDir,
-        `${snapshotIdentifier}.png`,
+        imageSnapshotFolder,
+        `${getSnapshotIdentifier(matcherContext, params)}.png`,
       );
       const imageBuffer = Buffer.from(response.data.content, "base64");
       fs.writeFileSync(imageSnapshotPath, imageBuffer);
+      console.log(imageSnapshotPath);
 
-      let userValidatedResponse: ReviewResponse = response.data;
-
-      if (process.stdin.isTTY) {
-        userValidatedResponse = await validateViolations(
-          imageSnapshotPath,
-          imageBuffer,
-          response.data,
-        );
-      }
-
-      const reviewMarkdown = reviewResponseToMarkdown(
-        userValidatedResponse,
-        imageSnapshotPath,
-      );
-      if (
-        !existingSnapshotFileContent ||
-        getContentHash(reviewMarkdown) !==
-          getContentHash(existingSnapshotFileContent)
-      ) {
-        logger.debug(`Snapshot ${snapshotPath} has changed, updating`);
-        fs.writeFileSync(snapshotPath, reviewMarkdown);
-      } else {
-        logger.debug(
-          `Snapshot ${snapshotPath} has not changed, skipping update`,
-        );
-      }
-
-      const message = () =>
-        pass
-          ? "Automated review successful"
-          : `Design review failed: ${explanation}\n\nTo override this, update the value of pass to true in ${snapshotPath}`;
-      return {
-        message,
-        pass,
-      };
+      return { pass: true, message: () => explanation || "" };
     },
   };
 };

@@ -4,14 +4,15 @@ import { z } from "zod";
 
 export const DesignReviewMatcherSchema = z.object({
   reviewEndpoint: z.string().optional(),
-  snapshotsDir: z.string().optional(),
   customStyles: z.array(z.string()),
   rules: z.array(RuleSchema).optional(),
+  strict: z.boolean().default(true),
   model: ModelSchema,
 });
-export type DesignReviewMatcher = z.infer<typeof DesignReviewMatcherSchema>;
+export type DesignReviewMatcher = z.input<typeof DesignReviewMatcherSchema>;
 
 export const DesignReviewRunSchema = z.object({
+  strict: z.boolean().default(true),
   atSize: RenderSizeSchema.optional(),
   log: z
     .union([
@@ -20,7 +21,13 @@ export const DesignReviewRunSchema = z.object({
     ])
     .optional(),
 });
-export type DesignReviewRun = z.infer<typeof DesignReviewRunSchema>;
+export type DesignReviewRun = z.input<typeof DesignReviewRunSchema>;
+
+export const JestSnapshotDataSchema = z.object({
+  contentHash: z.string(),
+  failedRules: z.array(z.string()),
+  pass: z.boolean(),
+});
 
 declare global {
   namespace jest {
