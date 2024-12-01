@@ -4,7 +4,9 @@ import {
   DEFAULT_RULES,
   type ReviewRequest,
   type ReviewResponse,
+  getExistingSnapshot,
   getViewportSize,
+  markSnapshotAsReviewed,
 } from "@vslint/shared";
 import { DEFAULT_REVIEW_ENDPOINT } from "@vslint/shared";
 import { getContentHash } from "@vslint/shared";
@@ -16,53 +18,16 @@ import {
   DesignReviewMatcherSchema,
   type DesignReviewRun,
   DesignReviewRunSchema,
-  JestSnapshotDataSchema,
 } from "@vslint/shared";
 import axios, { type AxiosError, type AxiosResponse } from "axios";
-import Json5 from "json5";
-
-const getExistingSnapshot = (matcherContext: jest.MatcherContext) => {
-  const snapshotState = matcherContext.snapshotState; // Jest's snapshot state
-  const currentTestName = matcherContext.currentTestName; // Current test name
-  const count = snapshotState._counters.get(currentTestName) || 0;
-  const snapshotKey = `${currentTestName} ${count + 1}`;
-  let snapshotData = snapshotState._snapshotData[snapshotKey];
-  if (!snapshotData) {
-    return null;
-  }
-  snapshotData = snapshotData.replace(/^\\n/, "").trim();
-
-  let parsedJson: unknown;
-  try {
-    parsedJson = Json5.parse(snapshotData);
-  } catch (err) {
-    return null;
-  }
-
-  const { data: parsedSnapshotData, error: parseError } =
-    JestSnapshotDataSchema.safeParse(parsedJson);
-  if (parseError) {
-    return null;
-  }
-  return parsedSnapshotData;
-};
-
-const markSnapshotAsReviewed = (matcherContext: jest.MatcherContext) => {
-  const snapshotState = matcherContext.snapshotState;
-  const currentTestName = matcherContext.currentTestName;
-  const count = snapshotState._counters.get(currentTestName) || 0;
-  const snapshotKey = `${currentTestName} ${count + 1}`;
-  snapshotState._counters.set(currentTestName, count + 1);
-  snapshotState._uncheckedKeys.delete(snapshotKey);
-};
 
 global.setImmediate =
   global.setImmediate ||
   ((fn: TimerHandler, ...args: unknown[]) => global.setTimeout(fn, 0, ...args));
 
 /**
- * Create a new jest matcher that exposes the `toPassDesignReview` method.
- * Expose this to your jest environment by running
+ * Create a new vitest matcher that exposes the `toPassDesignReview` method.
+ * Expose this to your vitest environment by running
  * expect.extend(extendExpectDesignReviewer({
  *   customStyles: ['./styles/globals.css'],
  *   model: {
@@ -122,7 +87,7 @@ export const extendExpectDesignReviewer = (unsafeArgs: DesignReviewMatcher) => {
       const logger = getLogger(params?.log);
 
       const strict = params?.strict ?? globalStrict;
-      console.log("strict", strict);
+
       if (!elementIsHTMLElement(received)) {
         const errorMessage =
           "Received invalid value for element. Make sure that you pass a HTMLElement object into your expect call! This should look like:\nconst { container } = render(...);\nexpect(container).toPassDesignReview();";
@@ -137,8 +102,11 @@ export const extendExpectDesignReviewer = (unsafeArgs: DesignReviewMatcher) => {
         path.dirname(matcherContext.snapshotState.snapshotPath),
         "vslint",
       );
-      console.log("imageSnapshotFolder", imageSnapshotFolder);
+
       if (!fs.existsSync(imageSnapshotFolder)) {
+        logger.debug(
+          `Creating image snapshot folder at ${imageSnapshotFolder}`,
+        );
         fs.mkdirSync(imageSnapshotFolder, { recursive: true });
       }
       const imageSnapshotPath = path.join(

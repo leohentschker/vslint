@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { kebabCase } from "./helpers";
+import { kebabCase } from "./crypto";
 
 test("kebabCase", () => {
   expect(kebabCase("helloWorld")).toBe("hello-world");

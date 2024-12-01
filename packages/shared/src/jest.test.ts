@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { getSnapshotIdentifier } from "./jest";
+import { getSnapshotIdentifier } from "./tests";
 
 test("getSnapshotIdentifier", () => {
   const expectState = {
