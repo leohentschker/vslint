@@ -6,7 +6,8 @@
   "author": "Leo Hentschker <lhentschker@gmail.com>",
   "scripts": {
     "build": "tsup",
-    "watch": "tsup --watch"
+    "watch": "tsup --watch",
+    "test": "vitest run"
   },
   "exports": {
     "./package.json": "./package.json",

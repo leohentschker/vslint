@@ -1,0 +1,12 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Snapshot tests work as expected 1`] = `
+{
+  "contentHash": "a609d33a5fc3aa470fcb91cb8c0ef126",
+  "failedRules": [
+    "missing-placeholders",
+    "no-bad-copy",
+  ],
+  "pass": false,
+}
+`;

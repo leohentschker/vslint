@@ -4,6 +4,7 @@
  */
 
 import path from "node:path";
+import Json5 from "json5";
 import { z } from "zod";
 import { kebabCase } from "./crypto";
 import { ModelSchema } from "./models";
@@ -62,7 +63,7 @@ export const getExistingSnapshot = (matcherContext: jest.MatcherContext) => {
 
   let parsedJson: unknown;
   try {
-    parsedJson = JSON.parse(snapshotData);
+    parsedJson = Json5.parse(snapshotData);
   } catch (err) {
     return null;
   }
