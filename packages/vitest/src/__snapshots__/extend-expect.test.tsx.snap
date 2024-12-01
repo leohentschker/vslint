@@ -7,7 +7,6 @@ exports[`Snapshot tests work as expected 1`] = `
     "missing-placeholders",
     "minimal-forms",
     "no-bad-copy",
-    "no-unclear-labels",
   ],
   "pass": false,
 }
