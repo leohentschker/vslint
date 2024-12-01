@@ -1,6 +1,6 @@
 import path from "node:path";
-import { kebabCase } from "./helpers";
-import type { DesignReviewRun } from "./types";
+import { kebabCase } from "@vslint/shared";
+import type { DesignReviewRun } from "@vslint/shared";
 
 export const getSnapshotIdentifier = (
   jestState: jest.MatcherState,

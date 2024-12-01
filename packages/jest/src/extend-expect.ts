@@ -2,24 +2,22 @@ import * as fs from "node:fs";
 import path from "node:path";
 import {
   DEFAULT_RULES,
-  type ReviewRequest,
-  type ReviewResponse,
-  getViewportSize,
-} from "@vslint/shared";
-import axios, { type AxiosError, type AxiosResponse } from "axios";
-import Json5 from "json5";
-import { DEFAULT_REVIEW_ENDPOINT } from "./constants";
-import { getContentHash } from "./helpers";
-import { getSnapshotIdentifier } from "./jest";
-import { getLogger } from "./logging";
-import { elementIsHTMLElement } from "./render";
-import {
   type DesignReviewMatcher,
   DesignReviewMatcherSchema,
   type DesignReviewRun,
   DesignReviewRunSchema,
   JestSnapshotDataSchema,
-} from "./types";
+  type ReviewRequest,
+  type ReviewResponse,
+  elementIsHTMLElement,
+  getContentHash,
+  getLogger,
+  getViewportSize,
+} from "@vslint/shared";
+import { DEFAULT_REVIEW_ENDPOINT } from "@vslint/shared";
+import axios, { type AxiosError, type AxiosResponse } from "axios";
+import Json5 from "json5";
+import { getSnapshotIdentifier } from "./jest";
 
 const getExistingSnapshot = (matcherContext: jest.MatcherContext) => {
   const snapshotState = matcherContext.snapshotState; // Jest's snapshot state

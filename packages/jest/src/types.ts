@@ -1,33 +1,4 @@
-import { ModelSchema, RenderSizeSchema, RuleSchema } from "@vslint/shared";
-import { Logger } from "winston";
-import { z } from "zod";
-
-export const DesignReviewMatcherSchema = z.object({
-  reviewEndpoint: z.string().optional(),
-  customStyles: z.array(z.string()),
-  rules: z.array(RuleSchema).optional(),
-  strict: z.boolean().default(true),
-  model: ModelSchema,
-});
-export type DesignReviewMatcher = z.input<typeof DesignReviewMatcherSchema>;
-
-export const DesignReviewRunSchema = z.object({
-  strict: z.boolean().default(true),
-  atSize: RenderSizeSchema.optional(),
-  log: z
-    .union([
-      z.enum(["debug", "info", "warning", "error"]),
-      z.instanceof(Logger),
-    ])
-    .optional(),
-});
-export type DesignReviewRun = z.input<typeof DesignReviewRunSchema>;
-
-export const JestSnapshotDataSchema = z.object({
-  contentHash: z.string(),
-  failedRules: z.array(z.string()),
-  pass: z.boolean(),
-});
+import type { DesignReviewRun } from "@vslint/shared";
 
 declare global {
   namespace jest {
