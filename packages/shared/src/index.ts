@@ -1,3 +1,7 @@
+global.setImmediate =
+  global.setImmediate ||
+  ((fn: TimerHandler, ...args: unknown[]) => global.setTimeout(fn, 0, ...args));
+
 export * from "./requests";
 export * from "./rules";
 export * from "./models";

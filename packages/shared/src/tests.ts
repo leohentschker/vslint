@@ -1,6 +1,5 @@
 import fs from "node:fs";
 import path from "node:path";
-import axios, { type AxiosError, type AxiosResponse } from "axios";
 import Json5 from "json5";
 import { z } from "zod";
 import { getContentHash, kebabCase } from "./crypto";
@@ -10,9 +9,10 @@ import {
   DEFAULT_REVIEW_ENDPOINT,
   type DesignReviewRun,
   DesignReviewRunSchema,
+  type Renderer,
+  defaultRenderer,
   getViewportSize,
 } from "./render";
-import type { ReviewRequest, ReviewResponse } from "./requests";
 import { DEFAULT_RULES, RuleSchema } from "./rules";
 
 export const DesignReviewMatcherSchema = z.object({
@@ -119,8 +119,11 @@ export const parseCustomMatcherArgs = (unsafeArgs: DesignReviewMatcher) => {
  * @param {DesignReviewMatcher} args - Configuration for the design reviewer
  */
 export const extendExpectDesignReviewer = (
-  getSnapshotPath: (matcherContext: jest.MatcherContext) => string,
   unsafeArgs: DesignReviewMatcher,
+  getSnapshotData: (matcherContext: jest.MatcherContext) => {
+    snapshotPath: string;
+  },
+  renderer: Renderer = defaultRenderer,
 ) => {
   const { args, stylesheets } = parseCustomMatcherArgs(unsafeArgs);
   const { model, rules, reviewEndpoint, strict: globalStrict } = args;
@@ -161,7 +164,7 @@ export const extendExpectDesignReviewer = (
       const existingSnapshot = getExistingSnapshot(matcherContext);
 
       const imageSnapshotFolder = path.join(
-        path.dirname(getSnapshotPath(matcherContext)),
+        path.dirname(getSnapshotData(matcherContext).snapshotPath),
         "vslint",
       );
 
@@ -208,11 +211,9 @@ export const extendExpectDesignReviewer = (
       const viewport = getViewportSize(params);
       logger.debug(`Viewport: ${JSON.stringify(viewport)}`);
 
-      let response: AxiosResponse<ReviewResponse, ReviewRequest>;
-
-      try {
-        logger.debug("Sending request to review endpoint");
-        const requestData: ReviewRequest = {
+      const { explanation, pass, violations, content } = await renderer(
+        reviewEndpoint || DEFAULT_REVIEW_ENDPOINT,
+        {
           content: received.outerHTML,
           stylesheets,
           rules: rules || DEFAULT_RULES,
@@ -223,24 +224,9 @@ export const extendExpectDesignReviewer = (
           testDetails: {
             name: expect.getState().currentTestName || "",
           },
-        };
-        response = await axios.post(
-          reviewEndpoint || DEFAULT_REVIEW_ENDPOINT,
-          requestData,
-        );
-      } catch (err) {
-        const axiosError = err as AxiosError;
-        logger.error(
-          `Error while sending request to review endpoint: ${axiosError.message}`,
-        );
-        console.log("axiosError", axiosError);
-        return {
-          pass: false,
-          message: () =>
-            `Error while sending request to review endpoint: ${axiosError.message}`,
-        };
-      }
-      const { explanation, pass, violations } = response.data;
+        },
+      );
+
       logger.debug(
         `Review result: ${JSON.stringify(violations, null, 2)}. Explanation: ${explanation}`,
       );
@@ -259,7 +245,7 @@ export const extendExpectDesignReviewer = (
         getLogger().error(explanation);
       }
 
-      const imageBuffer = Buffer.from(response.data.content, "base64");
+      const imageBuffer = Buffer.from(content, "base64");
       fs.writeFileSync(imageSnapshotPath, imageBuffer);
       console.log(imageSnapshotPath);
       console.log(matcherContext.snapshotState._snapshotPath);
