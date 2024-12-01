@@ -1,0 +1,13 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Snapshot tests work as expected 1`] = `
+{
+  "contentHash": "a609d33a5fc3aa470fcb91cb8c0ef126",
+  "failedRules": [
+    "missing-placeholders",
+    "minimal-forms",
+    "no-bad-copy",
+  ],
+  "pass": false,
+}
+`;

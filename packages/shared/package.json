@@ -5,7 +5,8 @@
   "types": "dist/index.d.ts",
   "author": "Leo Hentschker <lhentschker@gmail.com>",
   "scripts": {
-    "build": "tsup"
+    "build": "tsup",
+    "watch": "tsup --watch"
   },
   "exports": {
     "./package.json": "./package.json",

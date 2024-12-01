@@ -1,6 +1,5 @@
 import { Logger } from "winston";
 import { z } from "zod";
-import type { DesignReviewRun } from "./tests";
 
 export const RenderSizeSchema = z.union([
   z.enum([
@@ -22,6 +21,7 @@ export const RenderSizeSchema = z.union([
 ]);
 
 export const DesignReviewRunSchema = z.object({
+  strict: z.boolean().default(true),
   atSize: RenderSizeSchema.optional(),
   log: z
     .union([
@@ -30,6 +30,7 @@ export const DesignReviewRunSchema = z.object({
     ])
     .optional(),
 });
+export type DesignReviewRun = z.input<typeof DesignReviewRunSchema>;
 
 export const getViewportSize = (
   params?: DesignReviewRun,
@@ -102,3 +103,7 @@ export const getViewportSize = (
   }
   return params.atSize;
 };
+export const DEFAULT_REVIEW_ENDPOINT =
+  "https://vslint-644118703752.us-central1.run.app/api/v1/design-review";
+export const DEFAULT_LOCAL_REVIEW_ENDPOINT =
+  "http://localhost:8080/api/v1/design-review";
