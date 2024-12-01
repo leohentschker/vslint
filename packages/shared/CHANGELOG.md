@@ -1,5 +1,11 @@
 # @vslint/shared
 
+## 0.0.16
+
+### Patch Changes
+
+- ffb65e6: Adding in a lot of new helpers to enable vitest support
+
 ## 0.0.15
 
 ### Patch Changes

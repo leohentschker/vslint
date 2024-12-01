@@ -1,5 +1,12 @@
 # @vslint/jest
 
+## 0.3.5
+
+### Patch Changes
+
+- Updated dependencies [ffb65e6]
+  - @vslint/shared@0.0.16
+
 ## 0.3.4
 
 ### Patch Changes
