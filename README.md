@@ -39,7 +39,7 @@ npm install @vslint/vitest --save-dev
 ```
 
 ### Creating the design review matcher
-The first step is to add a new matcher to the testing framework's expect that performs the design review. This should likely be done via the `setupFilesAfterEnv` flag in the testing framework's config. You will likely need to install `@testing-library/jest-dom` to run your tests.
+The first step is to add a new matcher to the testing framework's expect that performs the design review. This should likely be done via the `setupFilesAfterEnv` flag in the testing framework's config.
 ```typescript
 // jest.config.js
 module.exports = {
@@ -109,6 +109,15 @@ test('render text that is too long and hard to read', async () => {
 
 ### Writing your own UX rules
 UX rules are written as JavaScript objects and passed into the `extendExpectDesignReviewer` call. You can view the default rules [here](./packages/shared/src/rules.ts).
+
+Rules are evaluated as part of a multi-modal LLM call, so they can be as complex as you want. Here is an example of a rule that checks if the text is too wide.
+```typescript
+{
+  ruleid: 'text-too-wide',
+  description: 'First write out how many words are on each line of text. If a single line of text, as it appears between line breaks (aka newlines), contains more than 30 words, excluding spaces and punctuation, mark it as true and explain which line is too long; otherwise, mark it as false.'
+}
+```
+As usual, the better you are at prompting the more effective your rules will be. One trick to writing good rules is to first ask the model to "focus" on the relevant part of your design. For example in the rule above, we first ask the model to count the words on each line of text before evaluating whether or not the text is too wide.
 
 ## Running a review server
 ### Run using `npx`
