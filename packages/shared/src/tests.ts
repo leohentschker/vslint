@@ -13,11 +13,7 @@ import {
   getViewportSize,
 } from "./render";
 import { DEFAULT_RULES, RuleSchema } from "./rules";
-import {
-  getExistingSnapshot,
-  getSnapshotIdentifier,
-  markSnapshotAsReviewed,
-} from "./snapshots";
+import { type JestSnapshotData, getSnapshotIdentifier } from "./snapshots";
 
 export const DesignReviewMatcherSchema = z.object({
   reviewEndpoint: z.string().optional(),
@@ -67,6 +63,8 @@ export const parseCustomMatcherArgs = (unsafeArgs: DesignReviewMatcher) => {
 export const extendExpectDesignReviewer = (
   unsafeArgs: DesignReviewMatcher,
   getSnapshotData: (matcherContext: jest.MatcherContext) => {
+    markSnapshotAsReviewed: () => void;
+    existingSnapshot: JestSnapshotData | null;
     snapshotPath: string;
   },
   renderer: Renderer = defaultRenderer,
@@ -107,10 +105,11 @@ export const extendExpectDesignReviewer = (
       }
 
       const matcherContext = this as unknown as jest.MatcherContext;
-      const existingSnapshot = getExistingSnapshot(matcherContext);
+      const { markSnapshotAsReviewed, existingSnapshot, snapshotPath } =
+        getSnapshotData(matcherContext);
 
       const imageSnapshotFolder = path.join(
-        path.dirname(getSnapshotData(matcherContext).snapshotPath),
+        path.dirname(snapshotPath),
         "vslint",
       );
 
@@ -127,10 +126,12 @@ export const extendExpectDesignReviewer = (
 
       // skip review if the snapshot already exists and the content hash matches
       if (existingSnapshot) {
+        console.log(existingSnapshot.contentHash);
+        console.log(getContentHash(received.outerHTML));
         if (
           existingSnapshot.contentHash === getContentHash(received.outerHTML)
         ) {
-          markSnapshotAsReviewed(matcherContext);
+          markSnapshotAsReviewed();
           let message: string;
           if (existingSnapshot.pass) {
             message =

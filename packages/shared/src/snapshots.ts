@@ -9,6 +9,7 @@ export const JestSnapshotDataSchema = z.object({
   failedRules: z.array(z.string()),
   pass: z.boolean(),
 });
+export type JestSnapshotData = z.infer<typeof JestSnapshotDataSchema>;
 
 export const getSnapshotIdentifier = (
   jestState: jest.MatcherState,

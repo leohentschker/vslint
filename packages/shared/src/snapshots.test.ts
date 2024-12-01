@@ -45,7 +45,10 @@ test("getExistingSnapshot returns snapshot data if snapshot exists", () => {
 
 test("markSnapshotAsReviewed", () => {
   const matcherContext = {
-    snapshotState: new Map(),
+    snapshotState: {
+      _counters: new Map([["test-name", 0]]),
+      _uncheckedKeys: new Set(["test-name 1"]),
+    },
     currentTestName: "test-name",
   } as Partial<jest.MatcherContext> as jest.MatcherContext;
   markSnapshotAsReviewed(matcherContext);
