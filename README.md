@@ -33,7 +33,12 @@ test('text content that is too wide on desktop screens and is not legible', asyn
 npm install @vslint/jest --save-dev
 ```
 
-#### Creating the design review matcher
+### Vitest
+```bash
+npm install @vslint/vitest --save-dev
+```
+
+### Creating the design review matcher
 The first step is to extend jest's expect to include a new matcher that performs the design review. This should likely be done via the `setupFilesAfterEnv` flag in the Jest config.
 ```typescript
 import { extendExpectDesignReviewer } from '@vslint/jest';
@@ -55,11 +60,11 @@ expect.extend(extendExpectDesignReviewer({
 | ------------------------ | -------- | ------------------------ | -------------------------------------------------------------------------------------------------------------------------- |
 | `customStyles`                  | `string[]`   |                          | The path to the css file that is used to generate the hash of the css file and the snapshot.
 | `strict`                  | `boolean`   | `true`                    | If true, tests will fail if any of the rules fail. If false, the test will pass and the snapshot will be logged with the results.
-| `model`                   | `{ modelName: string; key: string }`  |         | API credentials for the design review model. Supported models are `gpt-4o`, `gpt-4o-mini` and `gemini-1.5-flash`
+| `model`                   | `{ modelName: string; key: string }`  |         | API credentials for the design review model. Supported models are `gpt-4o`, `gpt-4o-mini`
 | `reviewEndpoint`          | `string`   | `https://vslint-644118703752.us-central1.run.app/api/v1/design-review` | The endpoint to use for the review server. Defaults to a shared review server.
 | `log`                     | `string` or `winston.Logger`  | `info`                    | Allows you to set a log level or pass in a custom Winston logger.
 
-#### Using the design review matcher
+### Using the design review matcher
 Now that the matcher is setup, you can use it in your tests to check if the snapshot passes design review. The `toPassDesignReview` method expects to be called on an `HTMLElement`.
 ```typescript
 import { render } from '@testing-library/react';
@@ -102,7 +107,7 @@ import { runReview } from '@vslint/server';
 ```
 
 ## Security and Privacy concerns
-VSLint supports using OpenAI and Gemini models to perform the design review as well as a shared backend design review server. While the benefit of using the shared backend is that it's free, this does mean that snapshots are sent to the OpenAI or Gemini API and that your API key is being sent to a server.
+VSLint supports using OpenAI to perform the design review as well as a shared backend design review server. While the benefit of using the shared backend is that it's free, this does mean that snapshots are sent to the OpenAI API and that your API key is being sent to a server.
 
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
