@@ -5,9 +5,9 @@
 # vslint (visual eslint) - use AI to enforce UI/UX patterns
 ![Sample test output showing design review feedback](./assets/sample_test_output.png)
 **TLDR**: Custom matcher for React testing frameworks that uses multi-modal AI models to enforce UI/UX patterns.
-* Supports the Jest testing framework and follows Jest's snapshot testing pattern
+* Supports the Jest and vitest testing frameworks and follows Jest's snapshot testing pattern
+* Uses headless Chrome and Puppeteer to render html snapshots
 * Supports using OpenAI models for analysis
-* Uses chromium to render html snapshots
 * Supports running a local review server with `npx @vslint/server` or in the cloud with a Dockerfile
 
 ```typescript
@@ -27,7 +27,7 @@ test('text content that is too wide on desktop screens and is not legible', asyn
 }, DEFAULT_REVIEW_TIMEOUT);
 ```
 
-## Usage
+## Writing tests
 ### Jest
 ```bash
 npm install @vslint/jest --save-dev
@@ -39,7 +39,7 @@ npm install @vslint/vitest --save-dev
 ```
 
 ### Creating the design review matcher
-The first step is to extend jest's expect to include a new matcher that performs the design review. This should likely be done via the `setupFilesAfterEnv` flag in the Jest config.
+The first step is to add a new matcher to the testing framework's expect that performs the design review. This should likely be done via the `setupFilesAfterEnv` flag in the testing framework's config.
 ```typescript
 import { extendExpectDesignReviewer } from '@vslint/jest';
 
@@ -48,7 +48,7 @@ expect.extend(extendExpectDesignReviewer({
   customStyles: ['./styles/globals.css'],
   // model config to determine which provider to use for analysis
   model: { modelName: 'gpt-4o-mini', key: process.env.OPENAI_API_KEY },
-  // optional, defaults to `DEFAULT_RULES` in '@vslint/jest/rules'
+  // optional, defaults to `DEFAULT_RULES` in '@vslint/shared/rules'
   rules: DEFAULT_RULES,
   // optional, sets a custom review endpoint. Override if you are self-hosting a review server
   reviewEndpoint: 'https://vslint-644118703752.us-central1.run.app/api/v1/design-review',
@@ -87,7 +87,7 @@ test('render text that is too long and hard to read', async () => {
 | `log`                     | `string` or `winston.Logger`  | `info`                    | Allows you to set a log level or pass in a custom Winston logger.
 | `strict`                  | `boolean`                    | `true`                    | If true, this test will fail if any of the rules fail. If false, the test will pass and the snapshot will be logged with the failing results. This overrides the global `strict` setting.
 
-## Accessing a review server
+## Running a review server
 ### Run using `npx`
 ```
 npx @vslint/server
@@ -106,8 +106,15 @@ You can run this in your existing backend by directly importing the `runReview` 
 import { runReview } from '@vslint/server';
 ```
 
+### Running using the shared backend
+You can run this in the shared backend by setting the `reviewEndpoint` parameter in the `extendExpectDesignReviewer` call to `DEFAULT_REVIEW_ENDPOINT` (this is also the default value).
+
+> ⚠️ **Warning:** The shared backend is not recommended for production use as it is a shared resource and rate limited.
+
 ## Security and Privacy concerns
 VSLint supports using OpenAI to perform the design review as well as a shared backend design review server. While the benefit of using the shared backend is that it's free, this does mean that snapshots are sent to the OpenAI API and that your API key is being sent to a server.
 
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+It's currently used in production at [Column](https://column.us) to enforce UI/UX patterns.
