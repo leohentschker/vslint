@@ -126,8 +126,6 @@ export const extendExpectDesignReviewer = (
 
       // skip review if the snapshot already exists and the content hash matches
       if (existingSnapshot) {
-        console.log(existingSnapshot.contentHash);
-        console.log(getContentHash(received.outerHTML));
         if (
           existingSnapshot.contentHash === getContentHash(received.outerHTML)
         ) {
@@ -140,7 +138,7 @@ export const extendExpectDesignReviewer = (
             message =
               "Snapshot already exists, content hash matches, previous review failed, but strict mode is disabled";
           } else {
-            message = `Review failed and strict mode is enabled. Test failed rules: ${existingSnapshot.failedRules.join(", ")}. Set strict: false to skip review for this test. You can delete the snapshot file at ${matcherContext.snapshotState._snapshotPath} to force a new review. Review the snapshot at ${imageSnapshotPath} to see what failed.`;
+            message = `Review failed and strict mode is enabled. Test failed rules: ${existingSnapshot.failedRules.join(", ")}. Set strict: false to skip review for this test. You can delete the snapshot file at ${snapshotPath} to force a new review. Review the snapshot at ${imageSnapshotPath} to see what failed.`;
           }
           return {
             pass: existingSnapshot.pass || !strict,

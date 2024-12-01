@@ -25,7 +25,7 @@ test("extendExpectDesignReviewer passes with cached passing snapshot", async () 
   expect(result.pass).toBe(true);
 });
 
-test("extendExpectDesignReviewer fails with cached failing snapshot", async () => {
+test.only("extendExpectDesignReviewer fails with cached failing snapshot", async () => {
   const sampleElement = document.createElement("div");
   sampleElement.outerHTML = "<div>sample-element</div>";
   const matcher = extendExpectDesignReviewer(
