@@ -8,7 +8,7 @@
 * Supports the Jest and vitest testing frameworks and follows Jest's snapshot testing pattern
 * Uses headless Chrome and Puppeteer to render html snapshots
 * Supports using OpenAI models for analysis
-* Supports running analysis locally, in your own cloud with a Dockerfile, or using a free (rate-limited)shared backend
+* Supports running analysis locally, in your own cloud with a Dockerfile, or using a free (rate-limited) shared backend
 
 ```typescript
 import { render } from '@testing-library/react';
@@ -39,7 +39,7 @@ npm install @vslint/vitest --save-dev
 ```
 
 ### Creating the design review matcher
-The first step is to add a new matcher to the testing framework's expect that performs the design review. This should likely be done via the `setupFilesAfterEnv` flag in the testing framework's config.
+The first step is to add a new matcher to the testing framework's expect that performs the design review. This should likely be done via the `setupFilesAfterEnv` flag in the testing framework's config. You will likely need to install `@testing-library/jest-dom` to run your tests.
 ```typescript
 // jest.config.js
 module.exports = {
@@ -76,9 +76,9 @@ expect.extend(extendExpectDesignReviewer({
 }));
 
 ```
-| Parameter                | type     | default                  | Description
-| ------------------------ | -------- | ------------------------ | -------------------------------------------------------------------------------------------------------------------------- |
-| `customStyles`                  | `string[]`   |                          | The path to the css file that is used to generate the hash of the css file and the snapshot.
+| Parameter                | type              | default       | Description
+| ------------------------ | ----------------- | ------------- | -------------- |
+| `customStyles`                  | `string[]`   |               | The path to the css file that is used to generate the hash of the css file and the snapshot.
 | `strict`                  | `boolean`   | `true`                    | If true, tests will fail if any of the rules fail. If false, the test will pass and the snapshot will be logged with the results.
 | `model`                   | `{ modelName: string; key: string }`  |         | API credentials for the design review model. Supported models are `gpt-4o`, `gpt-4o-mini`
 | `reviewEndpoint`          | `string`   | `https://vslint-644118703752.us-central1.run.app/api/v1/design-review` | The endpoint to use for the review server. Defaults to a shared review server.
@@ -107,6 +107,9 @@ test('render text that is too long and hard to read', async () => {
 | `log`                     | `string` or `winston.Logger`  | `info`                    | Allows you to set a log level or pass in a custom Winston logger.
 | `strict`                  | `boolean`                    | `true`                    | If true, this test will fail if any of the rules fail. If false, the test will pass and the snapshot will be logged with the failing results. This overrides the global `strict` setting.
 
+### Writing your own UX rules
+UX rules are written as JavaScript objects and passed into the `extendExpectDesignReviewer` call. You can view the default rules [here](./packages/shared/src/rules.ts).
+
 ## Running a review server
 ### Run using `npx`
 ```
@@ -130,6 +133,31 @@ import { runReview } from '@vslint/server';
 You can run this in the shared backend by setting the `reviewEndpoint` parameter in the `extendExpectDesignReviewer` call to `DEFAULT_REVIEW_ENDPOINT` (this is also the default value).
 
 > ⚠️ **Warning:** The shared backend is not recommended for production use as it is a shared resource and rate limited.
+
+## How do tests pass or fail?
+The full logic for how tests pass or fail for both Jest and Vitest is shown below.
+```mermaid
+flowchart TD
+    matchingSnapshot{Matching Snapshot?}
+
+    matchingSnapshot -->|No| inCI{In CI?}
+    inCI -->|Yes| failNoSnapshot[Fail: No Snapshot in CI]
+    inCI -->|No| hasOpenAICreds{Has OpenAI Credentials?}
+    hasOpenAICreds -->|Yes| runReview[Run Review]
+    hasOpenAICreds -->|No| runtimeException[Runtime Exception: Missing Credentials]
+
+    runReview --> reviewFails{Review Fails?}
+    reviewFails -->|Yes| strict{Strict Mode?}
+    strict -->|Yes| failReview[Fail: Review Failed]
+    strict -->|No| logSnapshot[Pass: Log Snapshot]
+    reviewFails -->|No| logSnapshot[Pass: Log Snapshot]
+
+    matchingSnapshot -->|Yes| markedFail{Marked Failing?}
+    markedFail -->|Yes| strictFail{Strict Mode?}
+    strictFail -->|Yes| failMarkedFail[Fail: Marked Failing in Strict Mode]
+    strictFail -->|No| pass[Pass: Matches Snapshot]
+    markedFail -->|No| pass[Pass: Matches Snapshot]
+```
 
 ## Security and Privacy concerns
 VSLint supports using OpenAI to perform the design review as well as a shared backend design review server. While the benefit of using the shared backend is that it's free, this does mean that snapshots are sent to the OpenAI API and that your API key is being sent to a server.
