@@ -1,5 +1,8 @@
+import axios, { type AxiosError, type AxiosResponse } from "axios";
 import { Logger } from "winston";
 import { z } from "zod";
+import { getLogger } from "./logging";
+import type { ReviewRequest, ReviewResponse } from "./requests";
 
 export const RenderSizeSchema = z.union([
   z.enum([
@@ -107,3 +110,31 @@ export const DEFAULT_REVIEW_ENDPOINT =
   "https://vslint-644118703752.us-central1.run.app/api/v1/design-review";
 export const DEFAULT_LOCAL_REVIEW_ENDPOINT =
   "http://localhost:8080/api/v1/design-review";
+
+export type Renderer = (
+  reviewEndpoint: string,
+  requestData: ReviewRequest,
+) => Promise<ReviewResponse>;
+export const defaultRenderer: Renderer = async (
+  reviewEndpoint: string,
+  requestData: ReviewRequest,
+): Promise<ReviewResponse> => {
+  let response: AxiosResponse<ReviewResponse, ReviewRequest>;
+
+  try {
+    getLogger().debug("Sending request to review endpoint");
+    response = await axios.post(
+      reviewEndpoint || DEFAULT_REVIEW_ENDPOINT,
+      requestData,
+    );
+    return response.data;
+  } catch (err) {
+    const axiosError = err as AxiosError;
+    getLogger().error(
+      `Error while sending request to review endpoint: ${axiosError.message}`,
+    );
+    throw new Error(
+      `Error while sending request to review endpoint: ${axiosError.message}`,
+    );
+  }
+};

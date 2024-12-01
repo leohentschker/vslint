@@ -5,8 +5,9 @@ import {
 
 export function extendExpectDesignReviewer(unsafeArgs: DesignReviewMatcher) {
   return sharedExtendExpectDesignReviewer(
-    (matcherContext: jest.MatcherContext) =>
-      matcherContext.snapshotState.snapshotPath as string,
     unsafeArgs,
+    (matcherContext: jest.MatcherContext) => ({
+      snapshotPath: matcherContext.snapshotState.snapshotPath as string,
+    }),
   );
 }
