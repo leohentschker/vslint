@@ -8,7 +8,7 @@
 * Supports the Jest and vitest testing frameworks and follows Jest's snapshot testing pattern
 * Uses headless Chrome and Puppeteer to render html snapshots
 * Supports using OpenAI models for analysis
-* Supports running a local review server with `npx @vslint/server` or in the cloud with a Dockerfile
+* Supports running analysis locally, in your own cloud with a Dockerfile, or using a free (rate-limited)shared backend
 
 ```typescript
 import { render } from '@testing-library/react';
@@ -41,6 +41,25 @@ npm install @vslint/vitest --save-dev
 ### Creating the design review matcher
 The first step is to add a new matcher to the testing framework's expect that performs the design review. This should likely be done via the `setupFilesAfterEnv` flag in the testing framework's config.
 ```typescript
+// jest.config.js
+module.exports = {
+  testEnvironment: "jsdom",
+  setupFilesAfterEnv: ["@testing-library/jest-dom", "./setupTests.js"],
+  ...
+};
+
+// or in vitest.config.js
+import { defineConfig } from "vitest/config";
+export default defineConfig({
+  test: {
+    environment: "jsdom",
+    setupFiles: "./setupTests.js",
+    globals: true,
+    ...
+  },
+});
+
+// setupFiles.js
 import { extendExpectDesignReviewer } from '@vslint/jest';
 
 expect.extend(extendExpectDesignReviewer({
@@ -55,6 +74,7 @@ expect.extend(extendExpectDesignReviewer({
   // optional, sets the log level (or a custom winston logger)
   log: 'debug'
 }));
+
 ```
 | Parameter                | type     | default                  | Description
 | ------------------------ | -------- | ------------------------ | -------------------------------------------------------------------------------------------------------------------------- |
@@ -65,7 +85,7 @@ expect.extend(extendExpectDesignReviewer({
 | `log`                     | `string` or `winston.Logger`  | `info`                    | Allows you to set a log level or pass in a custom Winston logger.
 
 ### Using the design review matcher
-Now that the matcher is setup, you can use it in your tests to check if the snapshot passes design review. The `toPassDesignReview` method expects to be called on an `HTMLElement`.
+Now that the matcher is setup, you can use it in your tests to check if the snapshot passes design review. The `toPassDesignReview` method expects to be called on an `HTMLElement`. Semantics are the same for Jest and Vitest.
 ```typescript
 import { render } from '@testing-library/react';
 
@@ -116,5 +136,3 @@ VSLint supports using OpenAI to perform the design review as well as a shared ba
 
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-It's currently used in production at [Column](https://column.us) to enforce UI/UX patterns.
