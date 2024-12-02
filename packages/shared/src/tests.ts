@@ -31,6 +31,10 @@ export const elementIsHTMLElement = (
   return typeof element === "object" && element !== null;
 };
 
+const getStrictnessLevel = ({ globalStrict, testStrict }: { globalStrict: boolean, testStrict: boolean | undefined }) => {
+  return testStrict && globalStrict;
+};
+
 export const parseCustomMatcherArgs = (unsafeArgs: DesignReviewMatcher) => {
   const { data: args, error: extendValidationError } =
     DesignReviewMatcherSchema.safeParse(unsafeArgs);
@@ -95,7 +99,10 @@ export const extendExpectDesignReviewer = (
 
       const logger = getLogger(params?.log);
 
-      const strict = params?.strict ?? globalStrict;
+      const strict = getStrictnessLevel({
+        globalStrict,
+        testStrict: params?.strict,
+      });
 
       if (!elementIsHTMLElement(received)) {
         const errorMessage =

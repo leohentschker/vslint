@@ -25,7 +25,7 @@ test("extendExpectDesignReviewer passes with cached passing snapshot", async () 
   expect(result.pass).toBe(true);
 });
 
-test.only("extendExpectDesignReviewer fails with cached failing snapshot", async () => {
+test("extendExpectDesignReviewer fails with cached failing snapshot", async () => {
   const sampleElement = document.createElement("div");
   sampleElement.outerHTML = "<div>sample-element</div>";
   const matcher = extendExpectDesignReviewer(
@@ -48,7 +48,7 @@ test.only("extendExpectDesignReviewer fails with cached failing snapshot", async
   expect(result.pass).toBe(false);
 });
 
-test("extendExpectDesignReviewer passes with cached failing snapshot but not strict", async () => {
+test("extendExpectDesignReviewer passes with cached failing snapshot but not strict set at the global level", async () => {
   const sampleElement = document.createElement("div");
   sampleElement.outerHTML = "<div>sample-element</div>";
   const matcher = extendExpectDesignReviewer(
@@ -69,5 +69,28 @@ test("extendExpectDesignReviewer passes with cached failing snapshot but not str
     }),
   );
   const result = await matcher.toPassDesignReview(sampleElement);
+  expect(result.pass).toBe(true);
+});
+
+test("extendExpectDesignReviewer passes with cached failing snapshot but not strict set at the test level", async () => {
+  const sampleElement = document.createElement("div");
+  sampleElement.outerHTML = "<div>sample-element</div>";
+  const matcher = extendExpectDesignReviewer(
+    {
+      customStyles: [],
+      model: { modelName: "gpt-4o-mini" },
+    },
+    () => ({
+      snapshotPath: "snapshot-path",
+      snapshotIdentifier: "snapshot-identifier",
+      markSnapshotAsReviewed: vitest.fn(),
+      existingSnapshot: {
+        contentHash: getContentHash(sampleElement.outerHTML),
+        failedRules: ["rule-1"],
+        pass: false,
+      },
+    }),
+  );
+  const result = await matcher.toPassDesignReview(sampleElement, { strict: false });
   expect(result.pass).toBe(true);
 });
