@@ -6,7 +6,11 @@ const srcDir = path.join(packageDir, "src");
 const distDir = path.join(packageDir, "dist");
 
 export default defineConfig({
-  entry: [path.join(srcDir, "index.ts"), path.join(srcDir, "cli.ts")],
+  entry: [
+    path.join(srcDir, "index.ts"),
+    path.join(srcDir, "cli.ts"),
+    path.join(srcDir, "app.ts"),
+  ],
   format: ["cjs", "esm"],
   dts: true,
   outDir: distDir,

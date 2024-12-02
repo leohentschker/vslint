@@ -67,10 +67,8 @@ app.post("/api/v1/design-review", async (req, res) => {
   res.json(response);
 });
 
-const startServer = () => {
+export const startServer = () => {
   return app.listen(port, () => {
     getLogger().info(`Listening on port ${port}`);
   });
 };
-
-export { startServer };
