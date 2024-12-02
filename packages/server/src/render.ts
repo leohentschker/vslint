@@ -15,21 +15,6 @@ const getBrowser = async () => {
   return _BROWSER;
 };
 
-export const getHtmlFromURL = async (url: string) => {
-  try {
-    const browser = await getBrowser();
-    const page = await browser.newPage();
-    await page.goto(url);
-    await page.waitForNetworkIdle({ idleTime: 500 });
-    const content = await page.content();
-    await page.close();
-    return Ok(content);
-  } catch (err) {
-    getLogger().error(`Failed to fetch URL: ${err}`);
-    return Failure(err);
-  }
-};
-
 export const getHtmlFromReviewRequest = ({
   content,
   stylesheets,
@@ -43,7 +28,7 @@ export const getHtmlFromReviewRequest = ({
 
 export const renderHtmlContent = async (
   html: string,
-  options: ReviewRequest["options"],
+  options: Pick<ReviewRequest["options"], "viewport">,
 ): Promise<Option<Buffer>> => {
   try {
     const browser = await getBrowser();
