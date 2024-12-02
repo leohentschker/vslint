@@ -1,3 +1,4 @@
+import * as fs from "node:fs";
 import sizeImage from "image-size";
 import { expect, test } from "vitest";
 import { renderHtmlContent } from "./render";
