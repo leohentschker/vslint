@@ -14,7 +14,10 @@ import {
 } from "./render";
 import { DEFAULT_RULES, RuleSchema } from "./rules";
 import { type JestSnapshotData, getSnapshotIdentifier } from "./snapshots";
-
+import {
+  type TestEnvironment,
+  defaultGetTestEnvironment,
+} from "./testEnvironment";
 export const DesignReviewMatcherSchema = z.object({
   reviewEndpoint: z.string().optional(),
   customStyles: z.array(z.string()),
@@ -69,12 +72,19 @@ export const parseCustomMatcherArgs = (unsafeArgs: DesignReviewMatcher) => {
  */
 export const extendExpectDesignReviewer = (
   unsafeArgs: DesignReviewMatcher,
-  getSnapshotData: (matcherContext: jest.MatcherContext) => {
-    markSnapshotAsReviewed: () => void;
-    existingSnapshot: JestSnapshotData | null;
-    snapshotPath: string;
+  {
+    getSnapshotData,
+    renderer = defaultRenderer,
+    getTestEnvironment = defaultGetTestEnvironment,
+  }: {
+    getSnapshotData: (matcherContext: jest.MatcherContext) => {
+      markSnapshotAsReviewed: () => void;
+      existingSnapshot: JestSnapshotData | null;
+      snapshotPath: string;
+    };
+    renderer?: Renderer;
+    getTestEnvironment?: () => TestEnvironment;
   },
-  renderer: Renderer = defaultRenderer,
 ) => {
   const { args, stylesheets } = parseCustomMatcherArgs(unsafeArgs);
   const { model, rules, reviewEndpoint, strict: globalStrict } = args;
@@ -163,6 +173,13 @@ export const extendExpectDesignReviewer = (
         );
       }
 
+      const { inCI } = getTestEnvironment();
+      if (inCI) {
+        throw new Error(
+          "Reviewing in CI is not supported yet. Snapshots must be generated locally.",
+        );
+      }
+
       const viewport = getViewportSize(params);
       logger.debug(`Viewport: ${JSON.stringify(viewport)}`);
 
@@ -202,8 +219,6 @@ export const extendExpectDesignReviewer = (
 
       const imageBuffer = Buffer.from(content, "base64");
       fs.writeFileSync(imageSnapshotPath, imageBuffer);
-      console.log(imageSnapshotPath);
-      console.log(matcherContext.snapshotState._snapshotPath);
 
       return { pass: pass || !strict, message: () => explanation || "" };
     },
