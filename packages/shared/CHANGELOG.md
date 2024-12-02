@@ -1,5 +1,11 @@
 # @vslint/shared
 
+## 0.0.17
+
+### Patch Changes
+
+- fe79356: Creating an eval suite and adding initial evals for default rules
+
 ## 0.0.16
 
 ### Patch Changes

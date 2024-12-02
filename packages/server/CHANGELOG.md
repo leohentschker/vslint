@@ -1,5 +1,13 @@
 # @vslint/server
 
+## 0.2.14
+
+### Patch Changes
+
+- fe79356: Creating an eval suite and adding initial evals for default rules
+- Updated dependencies [fe79356]
+  - @vslint/shared@0.0.17
+
 ## 0.2.13
 
 ### Patch Changes
