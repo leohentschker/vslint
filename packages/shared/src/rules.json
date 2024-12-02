@@ -16,12 +16,12 @@
     "description": "Titles and subtitle should have meaningfully differentiated copy; subtitles shouldn't just restate the title with more words. If the subtitle restates the title with more words, mark it as true; otherwise mark it as false."
   },
   {
-    "ruleid": "no-half-width-forms",
-    "description": "This rule only applies to forms. Note the approximate width of each row in the form. Form rows must adhere to the rule that each row either contains a single field spanning almost all of the container's width or multiple fields whose combined widths, including any padding or margin, equal almost all of the container's width. Valid configurations include one field at close to full width, two fields at around 50% width each, or three fields at approximately 33% width each. Any configuration where the combined widths and padding or margin of the fields do not fill the container's width will be considered invalid. If the form row does not adhere to this rule, mark it as true; otherwise, mark it as false."
+    "ruleid": "balanced-forms",
+    "description": "This rule only applies to forms. Look inside the form container. There should be no chunks of empty space outside of input element borders in a form row. If a form row has a chunk of empty space outside of input element borders, mark it as true; otherwise, mark it as false."
   },
   {
     "ruleid": "minimal-forms",
-    "description": "This rule only applies to forms with >2 elements. Forms should not use too many full width components and should instead collapse them into one row of two half-width components. If there are back to back full width components in your form, mark it as true; otherwise mark it as false."
+    "description": "This rule only applies to forms where one of the rows has more than one form input. Forms shouldn't have too many 100% wide inputs, when instead you could have two 50% wide inputs on a single row. If there are too many 100% wide inputs, mark it as true; otherwise mark it as false."
   },
   {
     "ruleid": "no-bad-copy",
@@ -29,7 +29,7 @@
   },
   {
     "ruleid": "no-default-checkboxes",
-    "description": "Unstyled default checkboxes look bad. If there is a default checkbox with no styling, mark it as true; otherwise mark it as false."
+    "description": "This rule only applies to checkbox inputs. Unstyled default checkboxes look bad. If there is a default checkbox with no styling, mark it as true; otherwise mark it as false."
   },
   {
     "ruleid": "no-unclear-labels",
