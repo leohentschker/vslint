@@ -29,13 +29,12 @@ test('text content that is too wide on desktop screens and is not legible', asyn
 ![Architecture](./assets/vslint_architecture.png)
 
 ## Writing tests
-### Jest
+### Installing vslint
 ```bash
+# for Jest
 npm install @vslint/jest --save-dev
-```
 
-### Vitest
-```bash
+# for Vitest
 npm install @vslint/vitest --save-dev
 ```
 
