@@ -139,9 +139,9 @@ import { runReview } from '@vslint/server';
 ```
 
 ### Running using the shared backend
-You can run this in the shared backend by setting the `reviewEndpoint` parameter in the `extendExpectDesignReviewer` call to `DEFAULT_REVIEW_ENDPOINT` (this is also the default value).
-
 > ⚠️ **Warning:** The shared backend is not recommended for production use as it is a shared resource and rate limited.
+
+You can run this in the shared backend by setting the `reviewEndpoint` parameter in the `extendExpectDesignReviewer` call to `DEFAULT_REVIEW_ENDPOINT` (this is also the default value).
 
 ## How do tests pass or fail?
 The full logic for how tests pass or fail for both Jest and Vitest is shown below.
