@@ -1,0 +1,7 @@
+{
+  "html": "<div>This should not be an issue</div>",
+  "viewport": {
+    "width": 375,
+    "height": 812
+  }
+}

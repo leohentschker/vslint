@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 import crypto from "node:crypto";
 import { ReviewRequestSchema, type ReviewResponse } from "@vslint/shared";
 import bodyParser from "body-parser";
@@ -68,6 +67,10 @@ app.post("/api/v1/design-review", async (req, res) => {
   res.json(response);
 });
 
-app.listen(port, () => {
-  getLogger().info(`Listening on port ${port}`);
-});
+const startServer = () => {
+  return app.listen(port, () => {
+    getLogger().info(`Listening on port ${port}`);
+  });
+};
+
+export { startServer };

@@ -3,6 +3,7 @@ import {
   Ok,
   type ReviewRequest,
   type ReviewResponse,
+  type Rule,
 } from "@vslint/shared";
 import OpenAI from "openai";
 import { z } from "zod";
@@ -13,7 +14,7 @@ const OpenaiResponseSchema = z.object({
   fail: z.boolean(),
 });
 
-const getOpenaiClient = (modelConfig: ReviewRequest["model"]) => {
+export const getOpenaiClient = (modelConfig: ReviewRequest["model"]) => {
   if (!modelConfig.key) return Failure(new Error("OPENAI_API_KEY not set"));
   return Ok(new OpenAI({ apiKey: modelConfig.key }));
 };
@@ -30,9 +31,9 @@ You need to evaluate the component against the rule and provide feedback on the 
 YOU ARE A SENIOR DESIGNER THAT CARES A LOT ABOUT DESIGN QUALITY AND DOES NOT MISS ANY DETAIL. WHEN YOU GIVE FEEDBACK IT SHOULD BE VERY DETAILED AND INCLUDE EXPLANATIONS IN THE CONTEXT OF THE SPECIFIC HTML PASSED IN.
 `.trim();
 
-const getChatCompletion = async (
-  reviewRequest: Pick<ReviewRequest, "model" | "rules">,
-  rule: ReviewRequest["rules"][number],
+export const getDesignReviewChatCompletion = async (
+  reviewRequest: Pick<ReviewRequest, "model">,
+  rule: Rule,
   openai: OpenAI,
   base64image: string,
   mimeType: string,
@@ -97,13 +98,14 @@ export const runOpenaiReview = async (
 
   const completionResults = await Promise.all(
     renderRequest.rules.map(async (rule) => {
-      const { response: result, error: openaiError } = await getChatCompletion(
-        renderRequest,
-        rule,
-        openai,
-        base64Content,
-        mimeType,
-      );
+      const { response: result, error: openaiError } =
+        await getDesignReviewChatCompletion(
+          renderRequest,
+          rule,
+          openai,
+          base64Content,
+          mimeType,
+        );
       if (openaiError) return Failure(openaiError);
       return Ok(result);
     }),
