@@ -8,7 +8,10 @@ export const ReviewRequestSchema = z.object({
   rules: z.array(RuleSchema),
   model: ModelSchema,
   options: z.object({
-    viewport: z.object({ width: z.number(), height: z.number() }),
+    viewport: z.union([
+      z.object({ width: z.number(), height: z.number() }),
+      z.literal("fit"),
+    ]),
   }),
   testDetails: z.object({
     name: z.string(),

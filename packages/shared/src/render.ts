@@ -35,9 +35,9 @@ export const DesignReviewRunSchema = z.object({
 });
 export type DesignReviewRun = z.input<typeof DesignReviewRunSchema>;
 
-export const getViewportSize = (
-  params?: DesignReviewRun,
-): { width: number; height: number } => {
+type ViewportSize = { width: number; height: number } | "fit";
+
+export const getViewportSize = (params?: DesignReviewRun): ViewportSize => {
   if (!params?.atSize) {
     return {
       width: 1920,
