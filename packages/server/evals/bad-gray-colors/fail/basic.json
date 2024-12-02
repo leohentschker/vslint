@@ -1,0 +1,7 @@
+{
+  "html": "<div style='font-weight: 400;'><p style='color: #808080;'>Hello</p><p style='color: #fafafa;'>World</p></div>",
+  "viewport": {
+    "width": 375,
+    "height": 812
+  }
+}

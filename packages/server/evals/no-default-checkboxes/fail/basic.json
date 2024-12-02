@@ -1,0 +1,7 @@
+{
+  "html": "<div style='width: 100%;'><input type='checkbox' /><label>I agree to the terms of service</label></div>",
+  "viewport": {
+    "width": 375,
+    "height": 100
+  }
+}

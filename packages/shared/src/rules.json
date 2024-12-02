@@ -5,7 +5,7 @@
   },
   {
     "ruleid": "bad-gray-colors",
-    "description": "First note the font weights of each line of text outside of an input element. This rule does not apply to fonts with different weights and it does not apply to text inside of input elements. IGNORE INPUT PLACEHOLDERS AND OTHER INPUT ELEMENTS. Gray text with the same font weight should have the same color. THIS ONLY APPLIES IF THE COLORS ARE REALLY REALLY DIFFERENT. If text components have really different shades of gray for the same font weight, mark it as true; otherwise, mark it as false."
+    "description": "Explain the size and font color of all stand-alone text elements. If visual hierarchy is created via color and not weight, mark it as true. Otherwise mark it as false."
   },
   {
     "ruleid": "missing-placeholders",
@@ -17,7 +17,7 @@
   },
   {
     "ruleid": "no-half-width-forms",
-    "description": "This rule only applies to forms with >1 rows. If there is one row return false. Look at the last row of forms and count the number of components. If there is only one component on the last row, it should take up the full width. However, if there are two or more components on the last row, they can be half-width or appropriately distributed. If there is just one component on the last row and it doesn't take up the full width, mark it as true; otherwise, mark it as false."
+    "description": "This rule only applies to forms. Note the approximate width of each row in the form. Form rows must adhere to the rule that each row either contains a single field spanning almost all of the container's width or multiple fields whose combined widths, including any padding or margin, equal almost all of the container's width. Valid configurations include one field at close to full width, two fields at around 50% width each, or three fields at approximately 33% width each. Any configuration where the combined widths and padding or margin of the fields do not fill the container's width will be considered invalid. If the form row does not adhere to this rule, mark it as true; otherwise, mark it as false."
   },
   {
     "ruleid": "minimal-forms",
@@ -29,7 +29,7 @@
   },
   {
     "ruleid": "no-default-checkboxes",
-    "description": "Default checkboxes look bad. If you're using the default input html checkbox, use a radio group or a card instead. If there is a default checkbox, mark it as true; otherwise mark it as false."
+    "description": "Unstyled default checkboxes look bad. If there is a default checkbox with no styling, mark it as true; otherwise mark it as false."
   },
   {
     "ruleid": "no-unclear-labels",
