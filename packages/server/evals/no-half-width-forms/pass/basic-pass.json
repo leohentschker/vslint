@@ -1,0 +1,7 @@
+{
+  "html": "<form style='width: 100%; border: 1px solid red;'><div><input style='width: 50%;' placeholder='Enter your name' type='text' /><input style='width: 50%;' placeholder='Enter your email' type='text' /></div><div><input style='width: 100%;' placeholder='Enter your name' type='text' /></div></form>",
+  "viewport": {
+    "width": 375,
+    "height": 812
+  }
+}

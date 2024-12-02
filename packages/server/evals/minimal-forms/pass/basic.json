@@ -1,0 +1,7 @@
+{
+  "html": "<div><input width='50%' type='text' placeholder='First Name' /><input width='50%' type='text' placeholder='Last Name' /></div><div><input width='50%' type='text' placeholder='Nickname' /><input width='50%' type='text' placeholder='Email' /></div>",
+  "viewport": {
+    "width": 375,
+    "height": 812
+  }
+}

@@ -107,8 +107,8 @@ test('render text that is too long and hard to read', async () => {
 | `log`                     | `string` or `winston.Logger`  | `info`                    | Allows you to set a log level or pass in a custom Winston logger.
 | `strict`                  | `boolean`                    | `true`                    | If true, this test will fail if any of the rules fail. If false, the test will pass and the snapshot will be logged with the failing results. This overrides the global `strict` setting.
 
-### Writing your own UX rules
-UX rules are written as JavaScript objects and passed into the `extendExpectDesignReviewer` call. You can view the default rules [here](./packages/shared/src/rules.ts).
+## Writing UX rules
+UX rules are written as JavaScript objects and passed into the `extendExpectDesignReviewer` call. You can view the default rules [here](./packages/shared/src/rules.json).
 
 Rules are evaluated as part of a multi-modal LLM call, so they can be as complex as you want. Here is an example of a rule that checks if the text is too wide.
 ```typescript
@@ -118,6 +118,36 @@ Rules are evaluated as part of a multi-modal LLM call, so they can be as complex
 }
 ```
 As usual, the better you are at prompting the more effective your rules will be. One trick to writing good rules is to first ask the model to "focus" on the relevant part of your design. For example in the rule above, we first ask the model to count the words on each line of text before evaluating whether or not the text is too wide.
+
+### Evaluating rules
+Evals are the unit tests for your rules. VSLint ships with an evaluation tool that allows you to test your design rules. You can use it via the `@vslint/server` package as follows:
+```bash
+npx @vslint/server evaluate --input path/to/evals --rules ./path/to/rules.json --model gpt-4o
+```
+In order to work properly, evals should be a directory with the following structure:
+```
+evals/
+  rule-id/
+    pass/
+      rule-id-pass-1.json
+      rule-id-pass-2.json
+      ...
+    fail/
+      rule-id-fail-1.json
+      rule-id-fail-2.json
+      ...
+```
+Each of the `.json` files should be in the following format:
+```json
+{
+  "html": "<html content here>",
+  "viewport": {
+    "width": 1920,
+    "height": 1080
+  }
+}
+```
+Evals for the default rule set can be found [here](./packages/server/evals).
 
 ## Running a review server
 ### Run using `npx`
@@ -167,6 +197,9 @@ flowchart TD
     strictFail -->|No| pass[Pass: Matches Snapshot]
     markedFail -->|No| pass[Pass: Matches Snapshot]
 ```
+
+## Contributing to the default rules
+Right now the default rules are not very good. All contributions are welcome! In order for a PR that changes rules to be merged, it must include at least one new failing and one passing eval.
 
 ## Security and Privacy concerns
 VSLint supports using OpenAI to perform the design review as well as a shared backend design review server. While the benefit of using the shared backend is that it's free, this does mean that snapshots are sent to the OpenAI API and that your API key is being sent to a server.

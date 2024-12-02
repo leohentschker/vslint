@@ -1,0 +1,7 @@
+{
+  "html": "<div><label>Account balance</label><input type='checkbox' /></div>",
+  "viewport": {
+    "width": 375,
+    "height": 812
+  }
+}
