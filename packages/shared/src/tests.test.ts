@@ -91,6 +91,8 @@ test("extendExpectDesignReviewer passes with cached failing snapshot but not str
       },
     }),
   );
-  const result = await matcher.toPassDesignReview(sampleElement, { strict: false });
+  const result = await matcher.toPassDesignReview(sampleElement, {
+    strict: false,
+  });
   expect(result.pass).toBe(true);
 });

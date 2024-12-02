@@ -31,7 +31,10 @@ export const elementIsHTMLElement = (
   return typeof element === "object" && element !== null;
 };
 
-const getStrictnessLevel = ({ globalStrict, testStrict }: { globalStrict: boolean, testStrict: boolean | undefined }) => {
+const getStrictnessLevel = ({
+  globalStrict,
+  testStrict,
+}: { globalStrict: boolean; testStrict: boolean | undefined }) => {
   return testStrict && globalStrict;
 };
 
