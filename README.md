@@ -26,6 +26,7 @@ test('text content that is too wide on desktop screens and is not legible', asyn
   await expect(container).toPassDesignReview();
 }, DEFAULT_REVIEW_TIMEOUT);
 ```
+![Architecture](./assets/vslint_architecture.png)
 
 ## Writing tests
 ### Jest
