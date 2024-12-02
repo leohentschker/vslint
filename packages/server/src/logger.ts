@@ -1,4 +1,4 @@
-import chalk, { ChalkInstance } from "chalk";
+import chalk, { type ChalkInstance } from "chalk";
 import winston from "winston";
 
 const customFormat = winston.format.printf(({ level, message, timestamp }) => {
