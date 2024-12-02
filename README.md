@@ -150,7 +150,10 @@ Each of the `.json` files should be in the following format:
   }
 }
 ```
-Evals for the default rule set can be found [here](./packages/server/evals).
+Evals for the default rule set can be found [here](./packages/server/evals). Writing your own evals is _highly_ recommended to ensure your rules are working as expected.
+
+### Contributing to the default rules
+Right now the default rules are not very good and all contributions are welcome! Please include at least one new failing and one passing eval for any PR that changes default rules.
 
 ## Running a review server
 ### Run using `npx`
@@ -200,9 +203,6 @@ flowchart TD
     strictFail -->|No| pass[Pass: Matches Snapshot]
     markedFail -->|No| pass[Pass: Matches Snapshot]
 ```
-
-## Contributing to the default rules
-Right now the default rules are not very good. All contributions are welcome! In order for a PR that changes rules to be merged, it must include at least one new failing and one passing eval.
 
 ## Security and Privacy concerns
 VSLint supports using OpenAI to perform the design review as well as a shared backend design review server. While the benefit of using the shared backend is that it's free, this does mean that snapshots are sent to the OpenAI API and that your API key is being sent to a server.
