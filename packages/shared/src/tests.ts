@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { z } from "zod";
-import { getContentHash, kebabCase } from "./crypto";
+import { getContentHash } from "./crypto";
 import { getLogger } from "./logging";
 import { ModelSchema } from "./models";
 import {

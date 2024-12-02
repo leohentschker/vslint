@@ -1,27 +1,7 @@
-import chalk, { type ChalkInstance } from "chalk";
 import winston from "winston";
 
 const customFormat = winston.format.printf(({ level, message, timestamp }) => {
-  let logLevelColor: ChalkInstance;
-
-  switch (level) {
-    case "error":
-      logLevelColor = chalk.red.bold;
-      break;
-    case "warn":
-      logLevelColor = chalk.yellow.bold;
-      break;
-    case "info":
-      logLevelColor = chalk.blue.bold;
-      break;
-    case "debug":
-      logLevelColor = chalk.green.bold;
-      break;
-    default:
-      logLevelColor = chalk.white.bold;
-  }
-
-  return `${chalk.gray(timestamp)} ${logLevelColor(level)}: ${chalk.white(message)}`;
+  return `${timestamp} ${level}: ${message}`;
 });
 
 let _LOGGER: null | winston.Logger = null;
