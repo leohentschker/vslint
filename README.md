@@ -8,7 +8,7 @@
 * Supports the Jest and vitest testing frameworks and follows Jest's snapshot testing pattern
 * Uses headless Chrome and Puppeteer to render html snapshots
 * Supports using OpenAI models for analysis
-* Supports running analysis locally, in your own cloud with a Dockerfile, or using a free (rate-limited) shared backend
+* Supports running locally, via Dockerfile, or using a free (rate-limited) shared backend
 
 ```typescript
 import { render } from '@testing-library/react';
@@ -26,15 +26,15 @@ test('text content that is too wide on desktop screens and is not legible', asyn
   await expect(container).toPassDesignReview();
 }, DEFAULT_REVIEW_TIMEOUT);
 ```
+![Architecture](./assets/vslint_architecture.png)
 
 ## Writing tests
-### Jest
+### Installing vslint
 ```bash
+# for Jest
 npm install @vslint/jest --save-dev
-```
 
-### Vitest
-```bash
+# for Vitest
 npm install @vslint/vitest --save-dev
 ```
 
