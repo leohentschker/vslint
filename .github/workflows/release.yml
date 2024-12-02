@@ -24,7 +24,7 @@ jobs:
           node-version: 20
 
       - name: Install Dependencies
-        run: npm install && npm install @vslint/shared
+        run: npm install && cd packages/jest && npm install && cd ../vitest && npm install && cd ../shared && npm install
 
       - name: Create Release Pull Request or Publish to npm
         id: changesets
