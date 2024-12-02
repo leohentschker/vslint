@@ -193,7 +193,7 @@ export const runDesignEvals = async () => {
     if (!ruleEvals) {
       continue;
     }
-    console.log(rule.description)
+    console.log(rule.description);
     for (const passingEval of ruleEvals.pass) {
       const reviewResponse = await getChatCompletionForEval(
         openai,
@@ -203,7 +203,9 @@ export const runDesignEvals = async () => {
       );
       if (reviewResponse.fail) {
         failingEvals.push(passingEval);
-        console.log(`Rule ${rule.ruleid} failed: ${passingEval.file} failed when it should have passed`);
+        console.log(
+          `Rule ${rule.ruleid} failed: ${passingEval.file} failed when it should have passed`,
+        );
         console.log(reviewResponse.explanation);
       } else {
         passingEvals.push(passingEval);
@@ -220,7 +222,9 @@ export const runDesignEvals = async () => {
       if (reviewResponse.fail) {
         passingEvals.push(failingEval);
       } else {
-        console.log(`Rule ${rule.ruleid} passed: ${failingEval.file} when it should have failed`);
+        console.log(
+          `Rule ${rule.ruleid} passed: ${failingEval.file} when it should have failed`,
+        );
         console.log(reviewResponse.explanation);
         failingEvals.push(failingEval);
       }
