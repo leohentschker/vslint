@@ -8,7 +8,7 @@
 * Supports the Jest and vitest testing frameworks and follows Jest's snapshot testing pattern
 * Uses headless Chrome and Puppeteer to render html snapshots
 * Supports using OpenAI models for analysis
-* Supports running analysis locally, in your own cloud with a Dockerfile, or using a free (rate-limited) shared backend
+* Supports running locally, via Dockerfile, or using a free (rate-limited) shared backend
 
 ```typescript
 import { render } from '@testing-library/react';

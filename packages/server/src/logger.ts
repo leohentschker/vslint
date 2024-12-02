@@ -2,7 +2,7 @@ import chalk from "chalk";
 import winston from "winston";
 
 const customFormat = winston.format.printf(({ level, message, timestamp }) => {
-  let logLevelColor: chalk.Chalk;
+  let logLevelColor;
 
   switch (level) {
     case "error":
