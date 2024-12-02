@@ -210,7 +210,7 @@ export const runDesignEvals = async () => {
     }
     console.log(rule.description);
     for (const passingEval of ruleEvals.pass) {
-      const { reviewResponse, encodedImage } = await getChatCompletionForEval(
+      const { reviewResponse } = await getChatCompletionForEval(
         openai,
         evalArgs["--model"],
         rule,
@@ -228,7 +228,7 @@ export const runDesignEvals = async () => {
     }
 
     for (const failingEval of ruleEvals.fail) {
-      const { reviewResponse, encodedImage } = await getChatCompletionForEval(
+      const { reviewResponse } = await getChatCompletionForEval(
         openai,
         evalArgs["--model"],
         rule,
