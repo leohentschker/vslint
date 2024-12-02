@@ -21,7 +21,7 @@
   },
   {
     "ruleid": "minimal-forms",
-    "description": "This rule only applies to forms with >2 elements. Forms should not use too many full width components and should instead collapse them into one row of two half-width components. If there are back to back full width components in your form, mark it as true; otherwise mark it as false."
+    "description": "This rule only applies to forms where one of the rows has more than one form input. Forms shouldn't have too many 100% wide inputs, when instead you could have two 50% wide inputs on a single row. If there are too many 100% wide inputs, mark it as true; otherwise mark it as false."
   },
   {
     "ruleid": "no-bad-copy",
@@ -29,7 +29,7 @@
   },
   {
     "ruleid": "no-default-checkboxes",
-    "description": "Unstyled default checkboxes look bad. If there is a default checkbox with no styling, mark it as true; otherwise mark it as false."
+    "description": "This rule only applies to checkbox inputs. Unstyled default checkboxes look bad. If there is a default checkbox with no styling, mark it as true; otherwise mark it as false."
   },
   {
     "ruleid": "no-unclear-labels",
