@@ -1,18 +1,98 @@
-import { expect, test } from "vitest";
-import { getSnapshotIdentifier } from "./tests";
+import { expect, test, vitest } from "vitest";
+import { getContentHash } from "./crypto";
+import { extendExpectDesignReviewer } from "./tests";
 
-test("getSnapshotIdentifier", () => {
-  const expectState = {
-    currentTestName: "current-test",
-    testPath: "./current-file.test.tsx",
-  } as jest.MatcherState;
-  expect(getSnapshotIdentifier(expectState, undefined)).toBe(
-    "current-file.test.tsx-current-test",
+test("extendExpectDesignReviewer passes with cached passing snapshot", async () => {
+  const sampleElement = document.createElement("div");
+  sampleElement.outerHTML = "<div>sample-element</div>";
+  const matcher = extendExpectDesignReviewer(
+    {
+      customStyles: [],
+      model: { modelName: "gpt-4o-mini" },
+    },
+    () => ({
+      snapshotPath: "snapshot-path",
+      snapshotIdentifier: "snapshot-identifier",
+      markSnapshotAsReviewed: vitest.fn(),
+      existingSnapshot: {
+        contentHash: getContentHash(sampleElement.outerHTML),
+        failedRules: [],
+        pass: true,
+      },
+    }),
   );
-  expect(getSnapshotIdentifier(expectState, { atSize: "sm" })).toBe(
-    "current-file.test.tsx-current-test-sm",
+  const result = await matcher.toPassDesignReview(sampleElement);
+  expect(result.pass).toBe(true);
+});
+
+test("extendExpectDesignReviewer fails with cached failing snapshot", async () => {
+  const sampleElement = document.createElement("div");
+  sampleElement.outerHTML = "<div>sample-element</div>";
+  const matcher = extendExpectDesignReviewer(
+    {
+      customStyles: [],
+      model: { modelName: "gpt-4o-mini" },
+    },
+    () => ({
+      snapshotPath: "snapshot-path",
+      snapshotIdentifier: "snapshot-identifier",
+      markSnapshotAsReviewed: vitest.fn(),
+      existingSnapshot: {
+        contentHash: getContentHash(sampleElement.outerHTML),
+        failedRules: ["rule-1"],
+        pass: false,
+      },
+    }),
   );
-  expect(
-    getSnapshotIdentifier(expectState, { atSize: { width: 100, height: 200 } }),
-  ).toBe("current-file.test.tsx-current-test-100x200");
+  const result = await matcher.toPassDesignReview(sampleElement);
+  expect(result.pass).toBe(false);
+});
+
+test("extendExpectDesignReviewer passes with cached failing snapshot but not strict set at the global level", async () => {
+  const sampleElement = document.createElement("div");
+  sampleElement.outerHTML = "<div>sample-element</div>";
+  const matcher = extendExpectDesignReviewer(
+    {
+      customStyles: [],
+      model: { modelName: "gpt-4o-mini" },
+      strict: false,
+    },
+    () => ({
+      snapshotPath: "snapshot-path",
+      snapshotIdentifier: "snapshot-identifier",
+      markSnapshotAsReviewed: vitest.fn(),
+      existingSnapshot: {
+        contentHash: getContentHash(sampleElement.outerHTML),
+        failedRules: ["rule-1"],
+        pass: false,
+      },
+    }),
+  );
+  const result = await matcher.toPassDesignReview(sampleElement);
+  expect(result.pass).toBe(true);
+});
+
+test("extendExpectDesignReviewer passes with cached failing snapshot but not strict set at the test level", async () => {
+  const sampleElement = document.createElement("div");
+  sampleElement.outerHTML = "<div>sample-element</div>";
+  const matcher = extendExpectDesignReviewer(
+    {
+      customStyles: [],
+      model: { modelName: "gpt-4o-mini" },
+    },
+    () => ({
+      snapshotPath: "snapshot-path",
+      snapshotIdentifier: "snapshot-identifier",
+      markSnapshotAsReviewed: vitest.fn(),
+      existingSnapshot: {
+        contentHash: getContentHash(sampleElement.outerHTML),
+        failedRules: ["rule-1"],
+        pass: false,
+      },
+    }),
+  );
+  const result = await matcher.toPassDesignReview(sampleElement, {
+    strict: false,
+  });
+  expect(result.pass).toBe(true);
 });

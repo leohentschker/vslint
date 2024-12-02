@@ -1,6 +1,5 @@
 import fs from "node:fs";
 import path from "node:path";
-import Json5 from "json5";
 import { z } from "zod";
 import { getContentHash, kebabCase } from "./crypto";
 import { getLogger } from "./logging";
@@ -14,6 +13,7 @@ import {
   getViewportSize,
 } from "./render";
 import { DEFAULT_RULES, RuleSchema } from "./rules";
+import { type JestSnapshotData, getSnapshotIdentifier } from "./snapshots";
 
 export const DesignReviewMatcherSchema = z.object({
   reviewEndpoint: z.string().optional(),
@@ -31,62 +31,11 @@ export const elementIsHTMLElement = (
   return typeof element === "object" && element !== null;
 };
 
-export const JestSnapshotDataSchema = z.object({
-  contentHash: z.string(),
-  failedRules: z.array(z.string()),
-  pass: z.boolean(),
-});
-
-export const getSnapshotIdentifier = (
-  jestState: jest.MatcherState,
-  params: DesignReviewRun | undefined,
-) => {
-  const { currentTestName, testPath } = jestState;
-  let sizeSuffix = "";
-  if (params?.atSize) {
-    sizeSuffix =
-      typeof params.atSize === "string"
-        ? params.atSize
-        : `${params.atSize.width}x${params.atSize.height}`;
-  }
-  return kebabCase(
-    `${path.basename(testPath || "")}-${currentTestName}${sizeSuffix ? `-${sizeSuffix}` : ""}`,
-  );
-};
-
-export const getExistingSnapshot = (matcherContext: jest.MatcherContext) => {
-  const snapshotState = matcherContext.snapshotState; // Jest's snapshot state
-  const currentTestName = matcherContext.currentTestName; // Current test name
-  const count = snapshotState._counters.get(currentTestName) || 0;
-  const snapshotKey = `${currentTestName} ${count + 1}`;
-  let snapshotData = snapshotState._snapshotData[snapshotKey];
-  if (!snapshotData) {
-    return null;
-  }
-  snapshotData = snapshotData.replace(/^\\n/, "").trim();
-
-  let parsedJson: unknown;
-  try {
-    parsedJson = Json5.parse(snapshotData);
-  } catch (err) {
-    return null;
-  }
-
-  const { data: parsedSnapshotData, error: parseError } =
-    JestSnapshotDataSchema.safeParse(parsedJson);
-  if (parseError) {
-    return null;
-  }
-  return parsedSnapshotData;
-};
-
-export const markSnapshotAsReviewed = (matcherContext: jest.MatcherContext) => {
-  const snapshotState = matcherContext.snapshotState;
-  const currentTestName = matcherContext.currentTestName;
-  const count = snapshotState._counters.get(currentTestName) || 0;
-  const snapshotKey = `${currentTestName} ${count + 1}`;
-  snapshotState._counters.set(currentTestName, count + 1);
-  snapshotState._uncheckedKeys.delete(snapshotKey);
+const getStrictnessLevel = ({
+  globalStrict,
+  testStrict,
+}: { globalStrict: boolean; testStrict: boolean | undefined }) => {
+  return testStrict && globalStrict;
 };
 
 export const parseCustomMatcherArgs = (unsafeArgs: DesignReviewMatcher) => {
@@ -121,6 +70,8 @@ export const parseCustomMatcherArgs = (unsafeArgs: DesignReviewMatcher) => {
 export const extendExpectDesignReviewer = (
   unsafeArgs: DesignReviewMatcher,
   getSnapshotData: (matcherContext: jest.MatcherContext) => {
+    markSnapshotAsReviewed: () => void;
+    existingSnapshot: JestSnapshotData | null;
     snapshotPath: string;
   },
   renderer: Renderer = defaultRenderer,
@@ -151,7 +102,10 @@ export const extendExpectDesignReviewer = (
 
       const logger = getLogger(params?.log);
 
-      const strict = params?.strict ?? globalStrict;
+      const strict = getStrictnessLevel({
+        globalStrict,
+        testStrict: params?.strict,
+      });
 
       if (!elementIsHTMLElement(received)) {
         const errorMessage =
@@ -161,10 +115,11 @@ export const extendExpectDesignReviewer = (
       }
 
       const matcherContext = this as unknown as jest.MatcherContext;
-      const existingSnapshot = getExistingSnapshot(matcherContext);
+      const { markSnapshotAsReviewed, existingSnapshot, snapshotPath } =
+        getSnapshotData(matcherContext);
 
       const imageSnapshotFolder = path.join(
-        path.dirname(getSnapshotData(matcherContext).snapshotPath),
+        path.dirname(snapshotPath),
         "vslint",
       );
 
@@ -184,7 +139,7 @@ export const extendExpectDesignReviewer = (
         if (
           existingSnapshot.contentHash === getContentHash(received.outerHTML)
         ) {
-          markSnapshotAsReviewed(matcherContext);
+          markSnapshotAsReviewed();
           let message: string;
           if (existingSnapshot.pass) {
             message =
@@ -193,7 +148,7 @@ export const extendExpectDesignReviewer = (
             message =
               "Snapshot already exists, content hash matches, previous review failed, but strict mode is disabled";
           } else {
-            message = `Review failed and strict mode is enabled. Test failed rules: ${existingSnapshot.failedRules.join(", ")}. Set strict: false to skip review for this test. You can delete the snapshot file at ${matcherContext.snapshotState._snapshotPath} to force a new review. Review the snapshot at ${imageSnapshotPath} to see what failed.`;
+            message = `Review failed and strict mode is enabled. Test failed rules: ${existingSnapshot.failedRules.join(", ")}. Set strict: false to skip review for this test. You can delete the snapshot file at ${snapshotPath} to force a new review. Review the snapshot at ${imageSnapshotPath} to see what failed.`;
           }
           return {
             pass: existingSnapshot.pass || !strict,
