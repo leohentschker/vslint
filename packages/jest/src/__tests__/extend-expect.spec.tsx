@@ -22,7 +22,7 @@ test("React rendering works as expected", () => {
 test(
   "Snapshot tests work as expected",
   async () => {
-    const { container } = render(<div>Testing content for design review</div>);
+    const { container } = render(<div>A server error has occurred. Please review your logs for more information.</div>);
     await expect(container).toPassDesignReview({ atSize: "xs", strict: false });
   },
   DEFAULT_REVIEW_TIMEOUT,

@@ -68,7 +68,12 @@ const getRenderArgs = () => {
 
 const loadRules = (rulesPath: string) => {
   const rules = fs.readFileSync(rulesPath, "utf8");
-  return z.array(RuleSchema).parse(JSON.parse(rules));
+  try {
+    return z.array(RuleSchema).parse(JSON.parse(rules));
+  } catch (e) {
+    console.error(`Failed to parse rules: ${e} in file ${rulesPath}`);
+    process.exit(1);
+  }
 };
 
 type Eval = {
@@ -101,8 +106,12 @@ const loadEvals = (inputDir: string, rules: Rule[]) => {
       }
       const evalFiles = fs.readdirSync(path.join(ruleDir, evalDir));
       for (const evalFile of evalFiles) {
-        const evalData = JSON.parse(
-          fs.readFileSync(path.join(ruleDir, evalDir, evalFile), "utf8"),
+        if (!evalFile.endsWith(".json")) {
+          continue;
+        }
+        try {
+          const evalData = JSON.parse(
+            fs.readFileSync(path.join(ruleDir, evalDir, evalFile), "utf8"),
         );
         ruleEvals[evalDir as "pass" | "fail"].push({
           html: evalData.html,
@@ -111,7 +120,11 @@ const loadEvals = (inputDir: string, rules: Rule[]) => {
           pass: evalDir === "pass",
           file: evalFile,
           path: path.join(ruleDir, evalDir, evalFile),
-        });
+          });
+        } catch (e) {
+          console.error(`Failed to parse eval: ${e} in file ${path.join(ruleDir, evalDir, evalFile)}`);
+          process.exit(1);
+        }
       }
     }
     evals[rule.ruleid] = ruleEvals;
@@ -146,7 +159,7 @@ const getChatCompletionForEval = async (
   getLogger().debug(
     `Rule ${rule.ruleid} review. Fail: ${!reviewResponse.fail}. Eval: ${reviewEval.file}`,
   );
-  return reviewResponse;
+  return { reviewResponse, encodedImage };
 };
 
 export const runDesignEvals = async () => {
@@ -195,7 +208,7 @@ export const runDesignEvals = async () => {
     }
     console.log(rule.description);
     for (const passingEval of ruleEvals.pass) {
-      const reviewResponse = await getChatCompletionForEval(
+      const { reviewResponse, encodedImage } = await getChatCompletionForEval(
         openai,
         evalArgs["--model"],
         rule,
@@ -207,13 +220,18 @@ export const runDesignEvals = async () => {
           `Rule ${rule.ruleid} failed: ${passingEval.file} failed when it should have passed`,
         );
         console.log(reviewResponse.explanation);
+        fs.writeFileSync(
+          path.join(evalArgs["--input"], rule.ruleid, "pass", "image.png"),
+          encodedImage
+        );
+        console.log(`Saved passing image to ${path.join(evalArgs["--input"], rule.ruleid, "pass", "image.png")}`);
       } else {
         passingEvals.push(passingEval);
       }
     }
 
     for (const failingEval of ruleEvals.fail) {
-      const reviewResponse = await getChatCompletionForEval(
+      const { reviewResponse, encodedImage } = await getChatCompletionForEval(
         openai,
         evalArgs["--model"],
         rule,
@@ -227,6 +245,11 @@ export const runDesignEvals = async () => {
         );
         console.log(reviewResponse.explanation);
         failingEvals.push(failingEval);
+        fs.writeFileSync(
+          path.join(evalArgs["--input"], rule.ruleid, "fail", "image.png"),
+          encodedImage
+        );
+        console.log(`Saved failed image to ${path.join(evalArgs["--input"], rule.ruleid, "fail", "image.png")}`);
       }
     }
   }

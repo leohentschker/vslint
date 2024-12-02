@@ -1,7 +1,7 @@
 {
-  "html": "<h1>Server error: review your logs for more information.</h1>",
+  "html": "<div>A server error has occurred. Please review your logs for more information.</div>",
   "viewport": {
-    "width": 375,
-    "height": 812
+    "width": 200,
+    "height": 100
   }
 }
