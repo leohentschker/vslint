@@ -16,8 +16,7 @@
     }
   },
   "bin": {
-    "@vslint/server": "./dist/app.js",
-    "eval": "./dist/evaluate.js"
+    "@vslint/server": "./dist/cli.js"
   },
   "dependencies": {
     "@google/generative-ai": "^0.19.0",

@@ -1,6 +1,6 @@
+import * as fs from "node:fs";
+import path from "node:path";
 import { z } from "zod";
-import * as fs from "fs";
-import path from "path";
 
 export const RuleSchema = z.object({
   ruleid: z.string().min(1).max(100),

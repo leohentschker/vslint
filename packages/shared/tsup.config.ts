@@ -1,6 +1,6 @@
+import * as fs from "node:fs";
 import path from "node:path";
 import { defineConfig } from "tsup";
-import * as fs from "fs";
 const packageDir = path.resolve(__dirname);
 const srcDir = path.join(packageDir, "src");
 const distDir = path.join(packageDir, "dist");

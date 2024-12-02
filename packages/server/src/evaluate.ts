@@ -149,7 +149,7 @@ const getChatCompletionForEval = async (
   return reviewResponse;
 };
 
-const runEval = async () => {
+export const runDesignEvals = async () => {
   if (!process.env.OPENAI_API_KEY) {
     console.error("Missing OPENAI_API_KEY environment variable");
     process.exit(1);
@@ -233,5 +233,3 @@ const runEval = async () => {
   );
   process.exit(0);
 };
-
-runEval();
