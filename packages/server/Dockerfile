@@ -31,8 +31,8 @@ COPY . .
 # Install tsup and typescript to build
 RUN npm install tsup typescript --save-dev
 
-# Install winston for logging
-RUN npm install winston
+# Install winston and chalk for logging
+RUN npm install winston chalk
 
 # Install the shared types package
 RUN npm install @vslint/shared
