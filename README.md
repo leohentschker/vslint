@@ -17,7 +17,10 @@ import Button from '../src/Button';
 
 expect.extend(extendExpectDesignReviewer({
   customStyles: ['./styles/globals.css'],
-  rules: DEFAULT_RULES,
+  rules: [{
+    ruleid: "text-too-wide",
+    description: "First write out how many words are on each line of text. If a single line of text, as it appears between line breaks (aka newlines), contains more than 30 words, excluding spaces and punctuation, mark it as true and explain which line is too long; otherwise, mark it as false."
+  }],
   model: { modelName: 'gpt-4o-mini', key: process.env.OPENAI_API_KEY }
 }));
 
@@ -122,7 +125,7 @@ As usual, the better you are at prompting the more effective your rules will be.
 ### Evaluating rules
 Evals are the unit tests for your rules. VSLint ships with an evaluation tool that allows you to test your design rules. You can use it via the `@vslint/server` package as follows:
 ```bash
-npx @vslint/server evaluate --input path/to/evals --rules ./path/to/rules.json --model gpt-4o
+npx @vslint/server eval --input path/to/evals --rules ./path/to/rules.json --model gpt-4o
 ```
 In order to work properly, evals should be a directory with the following structure:
 ```

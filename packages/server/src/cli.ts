@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { startServer } from "./app";
+import { startServer } from "./server";
 import { runDesignEvals } from "./evaluate";
 
 const args = process.argv.slice(2);
