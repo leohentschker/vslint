@@ -123,7 +123,7 @@ Rules are evaluated as part of a multi-modal LLM call, so they can be as complex
 As usual, the better you are at prompting the more effective your rules will be. One trick to writing good rules is to first ask the model to "focus" on the relevant part of your design. For example in the rule above, we first ask the model to count the words on each line of text before evaluating whether or not the text is too wide.
 
 ### Evaluating rules
-Evals are the unit tests for your rules. VSLint ships with an evaluation tool that allows you to test your design rules. You can use it via the `@vslint/server` package as follows:
+VSLint ships with an evaluation tool that allows you to test your design rules. You can use it via the `@vslint/server` package as follows:
 ```bash
 npx @vslint/server eval --input path/to/evals --rules ./path/to/rules.json --model gpt-4o
 ```
