@@ -1,7 +1,6 @@
 import { Failure, Ok, type Option, type ReviewRequest } from "@vslint/shared";
 import { JSDOM } from "jsdom";
 import puppeteer, { type Browser } from "puppeteer";
-import { getLogger } from "./logger";
 
 let _BROWSER: null | Browser = null;
 const getBrowser = async () => {

@@ -2,7 +2,7 @@ import axios, { type AxiosError, type AxiosResponse } from "axios";
 import { Logger } from "winston";
 import { z } from "zod";
 import { getLogger } from "./logging";
-import type { ReviewRequest, ReviewResponse } from "./requests";
+import type { ReviewRequest, ReviewResponse, Viewport } from "./requests";
 
 export const RenderSizeSchema = z.union([
   z.enum([
@@ -35,9 +35,7 @@ export const DesignReviewRunSchema = z.object({
 });
 export type DesignReviewRun = z.input<typeof DesignReviewRunSchema>;
 
-type ViewportSize = { width: number; height: number } | "fit";
-
-export const getViewportSize = (params?: DesignReviewRun): ViewportSize => {
+export const getViewportSize = (params?: DesignReviewRun): Viewport => {
   if (!params?.atSize) {
     return {
       width: 1920,

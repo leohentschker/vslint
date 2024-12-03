@@ -2,16 +2,19 @@ import { z } from "zod";
 import { ModelSchema } from "./models";
 import { RuleSchema } from "./rules";
 
+const ViewportSchema = z.union([
+  z.object({ width: z.number(), height: z.number() }),
+  z.literal("fit"),
+]);
+export type Viewport = z.infer<typeof ViewportSchema>;
+
 export const ReviewRequestSchema = z.object({
   content: z.string(),
   stylesheets: z.array(z.string()),
   rules: z.array(RuleSchema),
   model: ModelSchema,
   options: z.object({
-    viewport: z.union([
-      z.object({ width: z.number(), height: z.number() }),
-      z.literal("fit"),
-    ]),
+    viewport: ViewportSchema,
   }),
   testDetails: z.object({
     name: z.string(),
