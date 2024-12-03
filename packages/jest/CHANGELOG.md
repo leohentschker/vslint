@@ -1,5 +1,13 @@
 # @vslint/jest
 
+## 0.3.7
+
+### Patch Changes
+
+- 27f6405: Batch bumping due to change in viewport type
+- Updated dependencies [27f6405]
+  - @vslint/shared@0.0.18
+
 ## 0.3.6
 
 ### Patch Changes

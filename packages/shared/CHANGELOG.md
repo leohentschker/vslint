@@ -1,5 +1,11 @@
 # @vslint/shared
 
+## 0.0.18
+
+### Patch Changes
+
+- 27f6405: Batch bumping due to change in viewport type
+
 ## 0.0.17
 
 ### Patch Changes

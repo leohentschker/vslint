@@ -1,5 +1,13 @@
 # @vslint/vitest
 
+## 0.0.5
+
+### Patch Changes
+
+- 27f6405: Batch bumping due to change in viewport type
+- Updated dependencies [27f6405]
+  - @vslint/shared@0.0.18
+
 ## 0.0.4
 
 ### Patch Changes
