@@ -1,5 +1,13 @@
 # @vslint/server
 
+## 0.2.15
+
+### Patch Changes
+
+- 27f6405: Batch bumping due to change in viewport type
+- Updated dependencies [27f6405]
+  - @vslint/shared@0.0.18
+
 ## 0.2.14
 
 ### Patch Changes
