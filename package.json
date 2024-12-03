@@ -26,7 +26,7 @@
     "build": "cd packages/jest && npm run build && cd ../shared && npm run build",
     "format": "biome format --write",
     "check": "biome check",
-    "ci": "npm run build && npm run check && cd packages/jest && npm run test && cd ../vitest && npm run test && cd ../shared && npm run test && cd ../.. && npm run check-exports",
+    "ci": "npm run build && npm run check && cd packages/jest && npm run test && cd ../vitest && npm run test && cd ../shared && npm run test && cd ../server && npm run test && cd ../.. && npm run check-exports",
     "check-exports": "attw --pack ./packages/*",
     "start-release": "changeset",
     "local-release": "changeset version && changeset publish",

@@ -1,7 +1,6 @@
 import { Failure, Ok, type Option, type ReviewRequest } from "@vslint/shared";
 import { JSDOM } from "jsdom";
 import puppeteer, { type Browser } from "puppeteer";
-import { getLogger } from "./logger";
 
 let _BROWSER: null | Browser = null;
 const getBrowser = async () => {
@@ -34,10 +33,28 @@ export const renderHtmlContent = async (
     const browser = await getBrowser();
     const page = await browser.newPage();
     await page.setContent(html);
-    await page.setViewport({
-      ...options.viewport,
-      deviceScaleFactor: 2,
+    const { naturalWidth, naturalHeight } = await page.evaluate(() => {
+      const allChildren = Array.from(document.body.children);
+      const boundingBoxes = allChildren.map((child) =>
+        child.getBoundingClientRect(),
+      );
+
+      const maxWidth = Math.max(...boundingBoxes.map((box) => box.right));
+      const maxHeight = Math.max(...boundingBoxes.map((box) => box.bottom));
+
+      return {
+        naturalWidth: Math.ceil(maxWidth),
+        naturalHeight: Math.ceil(maxHeight),
+      };
     });
+
+    const viewportOptions = {
+      width: options.viewport === "fit" ? naturalWidth : options.viewport.width,
+      height:
+        options.viewport === "fit" ? naturalHeight : options.viewport.height,
+      deviceScaleFactor: 2,
+    };
+    await page.setViewport(viewportOptions);
     await page.waitForNetworkIdle();
     const pageScreenshot = await page.screenshot({ type: "png" });
     await page.close();
