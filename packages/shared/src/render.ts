@@ -16,6 +16,7 @@ export const RenderSizeSchema = z.union([
     "xl",
     "2xl",
     "3xl",
+    "fit",
   ]),
   z.object({
     width: z.number(),
@@ -25,7 +26,7 @@ export const RenderSizeSchema = z.union([
 
 export const DesignReviewRunSchema = z.object({
   strict: z.boolean().default(true),
-  atSize: RenderSizeSchema.optional(),
+  atSize: RenderSizeSchema.optional().default("fit"),
   log: z
     .union([
       z.enum(["debug", "info", "warning", "error"]),
@@ -35,12 +36,9 @@ export const DesignReviewRunSchema = z.object({
 });
 export type DesignReviewRun = z.input<typeof DesignReviewRunSchema>;
 
-export const getViewportSize = (params?: DesignReviewRun): Viewport => {
-  if (!params?.atSize) {
-    return {
-      width: 1920,
-      height: 1080,
-    };
+export const getViewportSize = (params: DesignReviewRun): Viewport => {
+  if (params.atSize === "fit" || !params.atSize) {
+    return "fit";
   }
   if (params.atSize === "full-screen") {
     return {
