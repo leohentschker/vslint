@@ -34,10 +34,7 @@ export const ReviewResponseSchema = z.object({
   ),
   name: z.string(),
   content: z.string(),
-  viewport: z.object({
-    width: z.number(),
-    height: z.number(),
-  }),
+  viewport: ViewportSchema,
   pass: z.boolean(),
 });
 export type ReviewResponse = z.infer<typeof ReviewResponseSchema>;
