@@ -6,7 +6,7 @@ exports[`Snapshot tests work as expected 1`] = `
   "failedRules": [
     "missing-placeholders",
     "balanced-forms",
-    "minimal-forms",
+    "no-unconstrained-width",
   ],
   "pass": false,
 }
