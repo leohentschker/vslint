@@ -2,6 +2,15 @@ import * as fs from "node:fs";
 import path from "node:path";
 import { z } from "zod";
 
+const RuleSampleSchema = z.object({
+  html: z.string().min(10),
+  viewport: z.object({
+    width: z.number(),
+    height: z.number(),
+  }),
+  fail: z.boolean(),
+});
+
 export const RuleSchema = z.object({
   ruleid: z.string().min(1).max(100),
   description: z
@@ -13,6 +22,7 @@ export const RuleSchema = z.object({
       if (!val.includes("mark it as false")) return false;
       return true;
     }, 'Rule must contain the phrase "mark it as true" as well as the phrase "mark it as false"'),
+  samples: z.array(RuleSampleSchema).optional(),
 });
 export type Rule = z.infer<typeof RuleSchema>;
 

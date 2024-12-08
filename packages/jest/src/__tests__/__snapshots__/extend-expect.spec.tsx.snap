@@ -5,8 +5,8 @@ exports[`Snapshot tests work as expected 1`] = `
   "contentHash": "1b7f124d21b942822d8fbad24d9b6206",
   "failedRules": [
     "missing-placeholders",
-    "balanced-forms",
     "minimal-forms",
+    "no-unconstrained-width",
   ],
   "pass": false,
 }
