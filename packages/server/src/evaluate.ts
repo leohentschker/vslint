@@ -148,7 +148,10 @@ const getChatCompletionForEval = async (
   }
   const { response: reviewResponse, error: reviewError } =
     await getDesignReviewChatCompletion(
-      { model: { modelName: model, key: process.env.OPENAI_API_KEY } },
+      {
+        model: { modelName: model, key: process.env.OPENAI_API_KEY },
+        options: { viewport: reviewEval.viewport },
+      },
       rule,
       openai,
       encodedImage.toString("base64"),

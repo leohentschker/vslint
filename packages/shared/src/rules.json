@@ -37,6 +37,6 @@
   },
   {
     "ruleid": "no-unconstrained-width",
-    "description": "First note how many pixels wide the screen is, assuming a DPI of 72. If the screen is less than 1440px wide, this rule does not apply and return false. Otherwise, content should generally not be the full screen width at very large screen sizes and should instead be constrained on a max width. If content in a full page layout stretches very wide on large screens, mark it as true; otherwise mark it as false."
+    "description": "Content elements like text, buttons, and forms should not be wider than 1440px. If an element as it looks in the evaluation is wider than 1440px, mark it as true; otherwise mark it as false."
   }
 ]
