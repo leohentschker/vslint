@@ -148,7 +148,10 @@ const getChatCompletionForEval = async (
   }
   const { response: reviewResponse, error: reviewError } =
     await getDesignReviewChatCompletion(
-      { model: { modelName: model, key: process.env.OPENAI_API_KEY } },
+      {
+        model: { modelName: model, key: process.env.OPENAI_API_KEY },
+        options: { viewport: reviewEval.viewport },
+      },
       rule,
       openai,
       encodedImage.toString("base64"),
@@ -210,7 +213,7 @@ export const runDesignEvals = async () => {
     }
     console.log(rule.description);
     for (const passingEval of ruleEvals.pass) {
-      const { reviewResponse } = await getChatCompletionForEval(
+      const { reviewResponse, encodedImage } = await getChatCompletionForEval(
         openai,
         evalArgs["--model"],
         rule,
@@ -222,13 +225,14 @@ export const runDesignEvals = async () => {
           `Rule ${rule.ruleid} failed: ${passingEval.file} failed when it should have passed`,
         );
         console.log(reviewResponse.explanation);
+        fs.writeFileSync(rule.ruleid + "-fail.png", encodedImage);
       } else {
         passingEvals.push(passingEval);
       }
     }
 
     for (const failingEval of ruleEvals.fail) {
-      const { reviewResponse } = await getChatCompletionForEval(
+      const { reviewResponse, encodedImage } = await getChatCompletionForEval(
         openai,
         evalArgs["--model"],
         rule,
@@ -241,6 +245,7 @@ export const runDesignEvals = async () => {
           `Rule ${rule.ruleid} passed: ${failingEval.file} when it should have failed`,
         );
         console.log(reviewResponse.explanation);
+        fs.writeFileSync(rule.ruleid + "-pass.png", encodedImage);
         failingEvals.push(failingEval);
       }
     }
