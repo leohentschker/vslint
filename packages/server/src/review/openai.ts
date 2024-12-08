@@ -16,11 +16,7 @@ const OpenaiResponseSchema = z.object({
 
 export const getOpenaiClient = (modelConfig: ReviewRequest["model"]) => {
   if (!modelConfig.key) return Failure(new Error("OPENAI_API_KEY not set"));
-  return Ok(new OpenAI({
-      apiKey: "AIzaSyCR3NkjBrc9rYjYrcPpo3rjPMp9JQ_rd5o", // || modelConfig.key,
-      baseURL: "https://generativelanguage.googleapis.com/v1beta/openai/",
-    }),
-  );
+  return Ok(new OpenAI({ apiKey: modelConfig.key }));
 };
 
 const BASE_OPENAI_SYSTEM_PROMPT = `
@@ -36,19 +32,18 @@ YOU ARE A SENIOR DESIGNER THAT CARES A LOT ABOUT DESIGN QUALITY AND DOES NOT MIS
 `.trim();
 
 export const getDesignReviewChatCompletion = async (
-  reviewRequest: Pick<ReviewRequest, "model" | "options">,
+  reviewRequest: Pick<ReviewRequest, "model">,
   rule: Rule,
   openai: OpenAI,
   base64image: string,
   mimeType: string,
 ) => {
   let completion: OpenAI.Chat.ChatCompletion;
-  const { options: viewport } = reviewRequest;
   try {
-    const userPrompt = `${BASE_OPENAI_SYSTEM_PROMPT}\n\nReturn in JSON format: { explanation: string; fail: boolean; }.\n\nHere is the rule you are evaluating:\n## ${rule.ruleid}\n${rule.description}. ${viewport ? `Viewport: ${JSON.stringify(viewport)}` : ""}`;
+    const userPrompt = `${BASE_OPENAI_SYSTEM_PROMPT}\n\nReturn in JSON format: { explanation: string; fail: boolean; }.\n\nHere is the rule you are evaluating:\n## ${rule.ruleid}\n${rule.description}`;
     getLogger().debug("Creating OpenAI chat completion");
     completion = await openai.chat.completions.create({
-      model: 'gemini-1.5-pro', // || reviewRequest.model.modelName,
+      model: reviewRequest.model.modelName,
       response_format: {
         type: "json_object",
       },
@@ -91,7 +86,7 @@ export const getDesignReviewChatCompletion = async (
 };
 
 export const runOpenaiReview = async (
-  renderRequest: Pick<ReviewRequest, "model" | "rules" | "options">,
+  renderRequest: Pick<ReviewRequest, "model" | "rules">,
   imageBuffer: Buffer,
   mimeType: "image/png",
 ) => {
