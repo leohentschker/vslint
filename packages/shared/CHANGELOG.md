@@ -1,5 +1,11 @@
 # @vslint/shared
 
+## 0.0.19
+
+### Patch Changes
+
+- dda8a3a: Adding in "examples" to rules for grounding
+
 ## 0.0.18
 
 ### Patch Changes
