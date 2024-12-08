@@ -28,7 +28,10 @@ test(
         information.
       </div>,
     );
-    await expect(container).toPassDesignReview({ atSize: "fit", strict: false });
+    await expect(container).toPassDesignReview({
+      atSize: "fit",
+      strict: false,
+    });
   },
   DEFAULT_REVIEW_TIMEOUT,
 );
