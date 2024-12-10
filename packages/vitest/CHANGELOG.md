@@ -1,5 +1,12 @@
 # @vslint/vitest
 
+## 0.0.7
+
+### Patch Changes
+
+- Updated dependencies [3d92497]
+  - @vslint/shared@0.0.20
+
 ## 0.0.6
 
 ### Patch Changes

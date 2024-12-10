@@ -1,6 +1,6 @@
 {
   "name": "@vslint/server",
-  "version": "0.2.16",
+  "version": "0.2.17",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "author": "Leo Hentschker <lhentschker@gmail.com>",
@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "@google/generative-ai": "^0.19.0",
-    "@vslint/shared": "^0.0.19",
+    "@vslint/shared": "^0.0.20",
     "arg": "^5.0.2",
     "body-parser": "^1.20.3",
     "chalk": "^5.3.0",
