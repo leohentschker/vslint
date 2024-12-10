@@ -1,5 +1,13 @@
 # @vslint/server
 
+## 0.2.17
+
+### Patch Changes
+
+- 3d92497: Enabling adding samples directly to the eval for few-shot prompting
+- Updated dependencies [3d92497]
+  - @vslint/shared@0.0.20
+
 ## 0.2.16
 
 ### Patch Changes

@@ -8,6 +8,7 @@ import {
 import OpenAI from "openai";
 import { z } from "zod";
 import { getLogger } from "../logger";
+import { renderHtmlContent } from "../render";
 
 const OpenaiResponseSchema = z.object({
   explanation: z.string().optional(),
@@ -40,8 +41,125 @@ export const getDesignReviewChatCompletion = async (
 ) => {
   let completion: OpenAI.Chat.ChatCompletion;
   try {
-    const userPrompt = `${BASE_OPENAI_SYSTEM_PROMPT}\n\nReturn in JSON format: { explanation: string; fail: boolean; }.\n\nHere is the rule you are evaluating:\n## ${rule.ruleid}\n${rule.description}`;
+    let rulePrompt = `${BASE_OPENAI_SYSTEM_PROMPT}\n\nReturn in JSON format: { explanation: string; fail: boolean; }.\n\nHere is the rule you are evaluating:\n## ${rule.ruleid}\n${rule.description}`;
     getLogger().debug("Creating OpenAI chat completion");
+    const failingExamples = rule.samples?.filter((sample) => sample.fail) || [];
+    const passingExamples =
+      rule.samples?.filter((sample) => !sample.fail) || [];
+
+    if (failingExamples.length && passingExamples.length) {
+      rulePrompt +=
+        "\n\nThe user will also provide you with examples of designs that pass and fail the rule.";
+    } else if (failingExamples.length) {
+      rulePrompt +=
+        "\n\nThe user will provide you with examples of designs that fail the rule.";
+    } else if (passingExamples.length) {
+      rulePrompt +=
+        "\n\nThe user will provide you with examples of designs that pass the rule.";
+    }
+
+    const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
+      {
+        role: "system",
+        content: [
+          {
+            type: "text",
+            text: rulePrompt,
+          },
+        ],
+      },
+    ];
+
+    if (failingExamples.length) {
+      const failingContent: OpenAI.Chat.Completions.ChatCompletionContentPart[] =
+        [
+          {
+            type: "text",
+            text: "Here are examples of designs that when rendered fail the rule",
+          },
+        ];
+      const failingImageSampleRenders = await Promise.all(
+        failingExamples.map(async (sample) => {
+          const { response: renderResponse, error: renderError } =
+            await renderHtmlContent(sample.html, { viewport: sample.viewport });
+          if (renderError) {
+            getLogger().error(renderError);
+            return Failure(renderError);
+          }
+          return Ok({
+            type: "image_url",
+            image_url: {
+              url: `data:image/png;base64,${renderResponse?.toString("base64")}`,
+            },
+          } as OpenAI.Chat.Completions.ChatCompletionContentPart);
+        }),
+      );
+      for (const failingImageSampleRender of failingImageSampleRenders) {
+        if (failingImageSampleRender.error) {
+          getLogger().error(failingImageSampleRender.error);
+          return Failure(failingImageSampleRender.error);
+        }
+        failingContent.push(failingImageSampleRender.response);
+      }
+      messages.push({
+        role: "user",
+        content: failingContent,
+      });
+    }
+
+    if (passingExamples.length) {
+      const passingContent: OpenAI.Chat.Completions.ChatCompletionContentPart[] =
+        [
+          {
+            type: "text",
+            text: "Here are examples of designs that when rendered pass the rule",
+          },
+        ];
+      const passingImageSampleRenders = await Promise.all(
+        passingExamples.map(async (sample) => {
+          const { response: renderResponse, error: renderError } =
+            await renderHtmlContent(sample.html, { viewport: sample.viewport });
+          if (renderError) {
+            getLogger().error(renderError);
+            return Failure(renderError);
+          }
+          return Ok({
+            type: "image_url",
+            image_url: {
+              url: `data:image/png;base64,${renderResponse?.toString("base64")}`,
+            },
+          } as OpenAI.Chat.Completions.ChatCompletionContentPart);
+        }),
+      );
+      for (const passingImageSampleRender of passingImageSampleRenders) {
+        if (passingImageSampleRender.error) {
+          getLogger().error(passingImageSampleRender.error);
+          return Failure(passingImageSampleRender.error);
+        }
+        passingContent.push(passingImageSampleRender.response);
+      }
+      messages.push({
+        role: "user",
+        content: passingContent,
+      });
+    }
+
+    messages.push({
+      role: "user",
+      content: [
+        {
+          type: "text",
+          text: "Here is the design you are reviewing",
+        },
+        {
+          type: "image_url",
+          image_url: {
+            url: `data:${mimeType};base64,${base64image}`,
+          },
+        },
+      ],
+    });
+
     completion = await openai.chat.completions.create({
       model: reviewRequest.model.modelName,
       response_format: {
@@ -49,24 +167,7 @@ export const getDesignReviewChatCompletion = async (
       },
       temperature: 0,
       seed: 42,
-      messages: [
-        {
-          role: "user",
-          content: [
-            {
-              type: "image_url",
-              image_url: {
-                url: `data:${mimeType};base64,${base64image}`,
-                detail: "high",
-              },
-            },
-          ],
-        },
-        {
-          role: "system",
-          content: userPrompt,
-        },
-      ],
+      messages,
     });
   } catch (error) {
     getLogger().error(error);

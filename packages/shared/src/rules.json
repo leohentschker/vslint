@@ -37,7 +37,7 @@
   },
   {
     "ruleid": "no-unconstrained-width",
-    "description": "Content does not need to take up the full screen width. If content is >1440px wide and is unconstrained, mark it as true; otherwise mark it as false.",
+    "description": "Content does not need to take up the full screen width. If content is too wide and unconstrained, mark it as true; otherwise mark it as false.",
     "samples": [
       {
         "html": "<div>A server error has occurred. Please review your logs for more information. A server error has occurred. Please review your logs for more information. A server error has occurred. Please review your logs for more information. A server error has occurred. Please review your logs for more information.</div>",
@@ -46,6 +46,14 @@
           "height": 50
         },
         "fail": true
+      },
+      {
+        "html": "<div>A server error has occurred. Please review your logs for more information.</div>",
+        "viewport": {
+          "width": 2040,
+          "height": 50
+        },
+        "fail": false
       }
     ]
   }
