@@ -123,7 +123,7 @@ Rules are evaluated as part of a multi-modal LLM call, so they can be as complex
 As usual, the better you are at prompting the more effective your rules will be. One trick to writing good rules is to first ask the model to "focus" on the relevant part of your design. For example in the rule above, we first ask the model to count the words on each line of text before evaluating whether or not the text is too wide.
 
 ### Adding samples for few-shot prompting
-Fun fact, vision model performance improves _drastically_ with few-shot prompting. This means that if you provide sampels demonstrating the rule failing and passing, the better the model will be at evaluating your rules.
+Fun fact, vision model performance improves _drastically_ with few-shot prompting. This means that if you provide samples demonstrating the rule failing and passing, the better the model will be at evaluating your rules.
 
 You can add these by adding a `samples` property to your rule.
 ```typescript
