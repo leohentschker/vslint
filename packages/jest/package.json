@@ -1,6 +1,6 @@
 {
   "name": "@vslint/jest",
-  "version": "0.3.9",
+  "version": "0.3.10",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "author": "Leo Hentschker <lhentschker@gmail.com>",
@@ -32,7 +32,7 @@
     }
   },
   "dependencies": {
-    "@vslint/shared": "^0.0.20",
+    "@vslint/shared": "^0.0.21",
     "axios": "^1.7.7"
   }
 }

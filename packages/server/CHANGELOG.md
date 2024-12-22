@@ -1,5 +1,12 @@
 # @vslint/server
 
+## 0.2.18
+
+### Patch Changes
+
+- Updated dependencies [6702f8d]
+  - @vslint/shared@0.0.21
+
 ## 0.2.17
 
 ### Patch Changes

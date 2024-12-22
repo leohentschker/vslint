@@ -1,5 +1,11 @@
 # @vslint/shared
 
+## 0.0.21
+
+### Patch Changes
+
+- 6702f8d: Tiny patch
+
 ## 0.0.20
 
 ### Patch Changes
