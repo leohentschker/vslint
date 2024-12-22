@@ -1,6 +1,6 @@
 {
   "name": "@vslint/vitest",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "author": "Leo Hentschker <lhentschker@gmail.com>",
@@ -30,7 +30,7 @@
     }
   },
   "dependencies": {
-    "@vslint/shared": "^0.0.20",
+    "@vslint/shared": "^0.0.21",
     "axios": "^1.7.7"
   }
 }
