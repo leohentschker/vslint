@@ -1,5 +1,14 @@
 # @vslint/server
 
+## 0.2.20
+
+### Patch Changes
+
+- 35b1c74: Adding in new model support
+- Updated dependencies [2c23de2]
+- Updated dependencies [35b1c74]
+  - @vslint/shared@0.0.23
+
 ## 0.2.19
 
 ### Patch Changes

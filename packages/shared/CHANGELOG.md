@@ -1,5 +1,12 @@
 # @vslint/shared
 
+## 0.0.23
+
+### Patch Changes
+
+- 2c23de2: Tiny patch
+- 35b1c74: Adding in new model support
+
 ## 0.0.22
 
 ### Patch Changes

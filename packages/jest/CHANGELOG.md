@@ -1,5 +1,15 @@
 # @vslint/jest
 
+## 0.3.12
+
+### Patch Changes
+
+- 2c23de2: Tiny patch
+- 35b1c74: Adding in new model support
+- Updated dependencies [2c23de2]
+- Updated dependencies [35b1c74]
+  - @vslint/shared@0.0.23
+
 ## 0.3.11
 
 ### Patch Changes
