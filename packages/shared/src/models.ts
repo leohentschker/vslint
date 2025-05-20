@@ -8,6 +8,8 @@ export const ModelSchema = z.object({
     "gemini-1.5",
     "gpt-4.1",
     "gpt-4.1-mini",
+    "o4-mini",
+    "o4",
   ]),
   key: z.string().optional(),
 });
