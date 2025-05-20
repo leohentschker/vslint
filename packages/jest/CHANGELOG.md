@@ -1,5 +1,13 @@
 # @vslint/jest
 
+## 0.3.11
+
+### Patch Changes
+
+- db58f29: Tiny patch
+- Updated dependencies [db58f29]
+  - @vslint/shared@0.0.22
+
 ## 0.3.10
 
 ### Patch Changes
