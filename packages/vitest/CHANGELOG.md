@@ -1,5 +1,12 @@
 # @vslint/vitest
 
+## 0.0.9
+
+### Patch Changes
+
+- Updated dependencies [db58f29]
+  - @vslint/shared@0.0.22
+
 ## 0.0.8
 
 ### Patch Changes

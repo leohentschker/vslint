@@ -1,5 +1,11 @@
 # @vslint/shared
 
+## 0.0.22
+
+### Patch Changes
+
+- db58f29: Tiny patch
+
 ## 0.0.21
 
 ### Patch Changes
