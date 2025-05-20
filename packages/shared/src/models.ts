@@ -6,6 +6,8 @@ export const ModelSchema = z.object({
     "gpt-4o",
     "gemini-1.5-flash",
     "gemini-1.5",
+    "gpt-4.1",
+    "gpt-4.1-mini",
   ]),
   key: z.string().optional(),
 });
